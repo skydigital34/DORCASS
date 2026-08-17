@@ -1,0 +1,227 @@
+/* ==========================================================================
+   DORCASS - Responsive Stylesheet (Compact Proportions)
+   ========================================================================== */
+
+@media (max-width: 1280px) {
+  .hero-stage {
+    grid-template-columns: 1fr 1.15fr 1fr;
+    gap: 12px;
+    min-height: 580px;
+  }
+
+  .title-line-2, .title-line-4 {
+    font-size: 3.2rem;
+  }
+
+  .title-line-1, .title-line-3 {
+    font-size: 1.9rem;
+  }
+
+  .arch-niche-backdrop {
+    width: 270px;
+    height: 360px;
+  }
+
+  .hero-model-layer {
+    max-width: 310px;
+  }
+
+  .featured-look-floating-card {
+    width: 195px;
+    padding: 10px 12px;
+  }
+
+  .featured-look-img-wrapper {
+    height: 150px;
+  }
+
+  .products-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 992px) {
+  .site-wrapper {
+    padding: 8px 12px;
+  }
+
+  .mockup-canvas {
+    padding: 16px 18px 20px;
+    border-radius: 24px;
+  }
+
+  .main-header {
+    grid-template-columns: 1fr auto;
+    gap: 12px;
+    padding-bottom: 10px;
+  }
+
+  .nav-links {
+    display: none;
+  }
+
+  .hero-stage {
+    grid-template-columns: 1fr;
+    gap: 28px;
+    text-align: center;
+    min-height: auto;
+  }
+
+  .hero-left-content {
+    align-items: center;
+    padding-right: 0;
+  }
+
+  .hero-main-title {
+    align-items: center;
+  }
+
+  .sparkle-doodle {
+    right: 25%;
+  }
+
+  .hero-description {
+    max-width: 440px;
+  }
+
+  .hero-center-visual {
+    min-height: 220px;
+    width: 100%;
+  }
+
+  .hero-right-content {
+    align-items: center;
+    width: 100%;
+  }
+
+  .feature-badges-row {
+    justify-content: center;
+  }
+
+  .featured-look-floating-card {
+    width: 240px;
+  }
+
+  .hero-stats-banner {
+    grid-template-columns: 1fr;
+    gap: 14px;
+    padding: 18px 16px;
+    border-radius: 30px;
+  }
+
+  .stats-divider {
+    display: none;
+  }
+
+  .collections-grid,
+  .reviews-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .story-banner {
+    grid-template-columns: 1fr;
+  }
+
+  .footer-top-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .quick-view-content {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .mockup-canvas {
+    padding: 14px 12px 18px;
+    border-radius: 20px;
+  }
+
+  .brand-name {
+    font-size: 1.35rem;
+    letter-spacing: 0.16em;
+  }
+
+  .title-line-2, .title-line-4 {
+    font-size: 2.6rem;
+  }
+
+  .title-line-1, .title-line-3 {
+    font-size: 1.6rem;
+  }
+
+  .hero-description {
+    font-size: 0.88rem;
+  }
+
+  .hero-cta-btn {
+    padding: 8px 18px;
+    font-size: 0.88rem;
+  }
+
+  .social-proof-pill {
+    padding: 5px 12px 5px 6px;
+  }
+
+  .avatar-circle {
+    width: 28px;
+    height: 28px;
+  }
+
+  .social-proof-label {
+    font-size: 0.74rem;
+  }
+
+  .arch-niche-backdrop {
+    width: 240px;
+    height: 320px;
+    border-radius: 120px 120px 0 0;
+    padding-top: 35px;
+  }
+
+  .hero-model-layer {
+    max-width: 270px;
+  }
+
+  .arch-stag-logo {
+    width: 36px;
+    height: 40px;
+  }
+
+  .arch-brand-title {
+    font-size: 1.15rem;
+  }
+
+  .feature-badge-card {
+    width: 70px;
+    padding: 6px 4px;
+  }
+
+  .badge-icon-box {
+    width: 26px;
+    height: 26px;
+  }
+
+  .badge-title {
+    font-size: 0.56rem;
+  }
+
+  .featured-look-floating-card {
+    width: 100%;
+    max-width: 240px;
+  }
+
+  .products-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .footer-top-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .footer-bottom {
+    flex-direction: column;
+    gap: 10px;
+    text-align: center;
+  }
+}

@@ -1,0 +1,228 @@
+/* ==========================================================================
+   DORCASS - Responsive Stylesheet (Tablet & Mobile Breakpoints)
+   ========================================================================== */
+
+/* Large Laptops & Desktops (< 1280px) */
+@media (max-width: 1280px) {
+  .hero-stage {
+    grid-template-columns: 1fr 1.2fr 1fr;
+    gap: 16px;
+  }
+
+  .title-line-2, .title-line-4 {
+    font-size: 3.8rem;
+  }
+
+  .title-line-1, .title-line-3 {
+    font-size: 2.3rem;
+  }
+
+  .arch-niche-backdrop {
+    width: 320px;
+    height: 440px;
+  }
+
+  .featured-look-floating-card {
+    width: 220px;
+    padding: 12px;
+  }
+
+  .featured-look-img-wrapper {
+    height: 190px;
+  }
+
+  .products-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Tablets & Small Laptops (< 992px) */
+@media (max-width: 992px) {
+  .site-wrapper {
+    padding: 10px;
+  }
+
+  .mockup-canvas {
+    padding: 20px 20px 28px;
+    border-radius: 28px;
+  }
+
+  .main-header {
+    grid-template-columns: 1fr auto;
+    gap: 16px;
+  }
+
+  .nav-links {
+    display: none; /* Mobile menu toggled */
+  }
+
+  .mobile-menu-btn {
+    display: flex !important;
+  }
+
+  .hero-stage {
+    grid-template-columns: 1fr;
+    gap: 40px;
+    text-align: center;
+  }
+
+  .hero-left-content {
+    align-items: center;
+    padding-right: 0;
+  }
+
+  .hero-main-title {
+    align-items: center;
+  }
+
+  .sparkle-doodle {
+    right: 25%;
+  }
+
+  .hero-description {
+    max-width: 480px;
+  }
+
+  .hero-center-visual {
+    min-height: 460px;
+    width: 100%;
+  }
+
+  .arch-niche-backdrop {
+    width: 340px;
+    height: 460px;
+  }
+
+  .hero-right-content {
+    align-items: center;
+    width: 100%;
+  }
+
+  .feature-badges-row {
+    justify-content: center;
+  }
+
+  .featured-look-floating-card {
+    width: 280px;
+  }
+
+  .hero-stats-banner {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding: 24px 20px;
+    border-radius: 36px;
+  }
+
+  .stats-divider {
+    display: none;
+  }
+
+  .collections-grid,
+  .reviews-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .story-banner {
+    grid-template-columns: 1fr;
+  }
+
+  .footer-top-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .quick-view-content {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Mobile Devices (< 600px) */
+@media (max-width: 600px) {
+  .mockup-canvas {
+    padding: 16px 14px 24px;
+    border-radius: 20px;
+  }
+
+  .brand-name {
+    font-size: 1.45rem;
+    letter-spacing: 0.16em;
+  }
+
+  .title-line-2, .title-line-4 {
+    font-size: 3rem;
+  }
+
+  .title-line-1, .title-line-3 {
+    font-size: 1.9rem;
+  }
+
+  .hero-description {
+    font-size: 0.95rem;
+  }
+
+  .hero-cta-btn {
+    padding: 10px 22px;
+    font-size: 0.95rem;
+  }
+
+  .social-proof-pill {
+    padding: 6px 14px 6px 8px;
+  }
+
+  .avatar-circle {
+    width: 32px;
+    height: 32px;
+  }
+
+  .social-proof-label {
+    font-size: 0.78rem;
+  }
+
+  .arch-niche-backdrop {
+    width: 280px;
+    height: 380px;
+    border-radius: 140px 140px 0 0;
+    padding-top: 45px;
+  }
+
+  .arch-stag-logo {
+    width: 44px;
+    height: 48px;
+  }
+
+  .arch-brand-title {
+    font-size: 1.3rem;
+  }
+
+  .feature-badge-card {
+    width: 80px;
+    padding: 8px 6px;
+  }
+
+  .badge-icon-box {
+    width: 30px;
+    height: 30px;
+  }
+
+  .badge-title {
+    font-size: 0.62rem;
+  }
+
+  .featured-look-floating-card {
+    width: 100%;
+    max-width: 280px;
+  }
+
+  .products-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .footer-top-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .footer-bottom {
+    flex-direction: column;
+    gap: 12px;
+    text-align: center;
+  }
+}
