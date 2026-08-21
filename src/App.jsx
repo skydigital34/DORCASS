@@ -1,11 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import './styles/style.css';
 import './styles/responsive.css';
 
 import { storeData } from './data/storeData';
+import { resolveNavigationFromPath } from './data/categoriesData';
 import { Header } from './components/Header';
 import { Hero } from './components/Hero';
 import { ProductCatalog } from './components/ProductCatalog';
+import { CategoryPage } from './components/CategoryPage';
 import { CuratedCollections } from './components/CuratedCollections';
 import { BrandStory } from './components/BrandStory';
 import { Reviews } from './components/Reviews';
@@ -15,13 +17,20 @@ import { CartDrawer } from './components/CartDrawer';
 import { QuickViewModal } from './components/QuickViewModal';
 import { SearchOverlay } from './components/SearchOverlay';
 import { Toast } from './components/Toast';
+import { WhatsAppFloatingBtn } from './components/WhatsAppFloatingBtn';
 
 export function App() {
+  // Navigation & Category Filtering State
+  const [currentPath, setCurrentPath] = useState(window.location.pathname || '/');
+  const [activeCategory, setActiveCategory] = useState('all');
+  const [activeSubcategory, setActiveSubcategory] = useState(null);
+  const [activeTertiaryCategory, setActiveTertiaryCategory] = useState(null);
+
   // Cart State (Initialized with 1 item matching mockup)
   const [cart, setCart] = useState([
     {
-      id: 'prod-1',
-      title: 'Elegant Saree - Rose Silk',
+      id: 'prod-saree-chennur',
+      title: 'Elegant Saree - Rose Chennur Silk',
       price: 1299.00,
       image: '/assets/images/featured-saree.jpg',
       size: 'Free Size',
@@ -36,13 +45,94 @@ export function App() {
   const [quickViewProduct, setQuickViewProduct] = useState(null);
   const [toasts, setToasts] = useState([]);
 
-  // Add Toast helper
+  // Toast notification helper
   const addToast = (message) => {
     const id = Date.now() + Math.random();
     setToasts(prev => [...prev, { id, message }]);
     setTimeout(() => {
       setToasts(prev => prev.filter(t => t.id !== id));
     }, 3500);
+  };
+
+  // Synchronize state with URL path
+  const syncRouteState = useCallback((pathname, shouldScroll = false) => {
+    setCurrentPath(pathname);
+    const resolved = resolveNavigationFromPath(pathname);
+
+    if (resolved) {
+      if (resolved.categorySlug) {
+        setActiveCategory(resolved.categorySlug);
+      }
+      setActiveSubcategory(resolved.subcategorySlug || null);
+      setActiveTertiaryCategory(resolved.tertiarySlug || null);
+
+      if (shouldScroll && resolved.sectionId) {
+        const el = document.getElementById(resolved.sectionId);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth' });
+        }
+      }
+    } else {
+      setActiveCategory('all');
+      setActiveSubcategory(null);
+      setActiveTertiaryCategory(null);
+    }
+  }, []);
+
+  // Listen to browser popstate (back/forward) and initial load
+  useEffect(() => {
+    syncRouteState(window.location.pathname, false);
+
+    const handlePopState = () => {
+      syncRouteState(window.location.pathname, true);
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [syncRouteState]);
+
+  // Unified navigation handler
+  const handleNavigate = useCallback(({ path, sectionId = null, category = null, subcategory = null, tertiaryCategory = null }) => {
+    if (window.location.pathname !== path) {
+      window.history.pushState(null, '', path);
+    }
+    setCurrentPath(path);
+
+    if (category) {
+      setActiveCategory(category);
+    }
+    setActiveSubcategory(subcategory);
+    setActiveTertiaryCategory(tertiaryCategory);
+
+    if (sectionId) {
+      const el = document.getElementById(sectionId);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth' });
+      }
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, []);
+
+  // Catalog Category Tab / Filter Change (For Home Catalog preview)
+  const handleCategoryChange = (catId, subcatId = null, tertiaryId = null) => {
+    let newPath = '/category/sarees';
+    if (catId && catId !== 'all') {
+      newPath = `/category/${catId}`;
+      if (subcatId) {
+        newPath += `/${subcatId}`;
+        if (tertiaryId) {
+          newPath += `/${tertiaryId}`;
+        }
+      }
+    }
+    
+    handleNavigate({
+      path: newPath,
+      category: catId,
+      subcategory: subcatId,
+      tertiaryCategory: tertiaryId
+    });
   };
 
   // Add to cart handler
@@ -135,63 +225,93 @@ export function App() {
     setQuickViewProduct(null);
   };
 
-  // Smooth scroll
+  // Smooth scroll explore handler
   const handleExplore = (e) => {
     e.preventDefault();
-    const catalog = document.getElementById('shopCatalog');
-    if (catalog) {
-      catalog.scrollIntoView({ behavior: 'smooth' });
-    }
+    handleNavigate({
+      path: '/category/sarees',
+      category: 'sarees',
+      subcategory: null,
+      tertiaryCategory: null
+    });
   };
 
   const cartTotalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
 
+  // Determine current page view: Home vs CategoryPage
+  const isHomePage = currentPath === '/' || currentPath === '/home';
+  const isAboutPage = currentPath === '/about';
+  const isContactPage = currentPath === '/contact';
+  const isCategoryOrNewArrivals = !isHomePage && !isAboutPage && !isContactPage;
+
+  const currentCategoryInfo = resolveNavigationFromPath(currentPath);
+
   return (
     <div className="site-wrapper">
-      {/* Main Mockup Canvas Frame (1:1 with Reference Design) */}
-      <main className="mockup-canvas" id="home">
-        {/* Header */}
-        <Header 
-          onOpenSearch={() => setIsSearchOpen(true)}
-          onOpenCart={() => setIsCartOpen(true)}
-          cartCount={cartTotalItems}
-          userAvatar="/assets/images/avatar-1.jpg"
-        />
-
-        {/* Hero Section */}
-        <Hero 
-          featuredProduct={storeData.products[0]}
-          onQuickView={handleOpenQuickView}
-          onExplore={handleExplore}
-        />
-      </main>
-
-      {/* Extended Store Catalog */}
-      <ProductCatalog 
-        categories={storeData.categories}
-        products={storeData.products}
-        onAddToCart={handleAddToCart}
-        onQuickView={handleOpenQuickView}
-        wishlist={wishlist}
-        onToggleWishlist={handleToggleWishlist}
+      {/* Global Header with Main Nav & Categories Mega-Menu */}
+      <Header 
+        onOpenSearch={() => setIsSearchOpen(true)}
+        onOpenCart={() => setIsCartOpen(true)}
+        cartCount={cartTotalItems}
+        userAvatar="/assets/images/avatar-1.jpg"
+        onNavigate={handleNavigate}
+        activeCategorySlug={activeCategory}
+        activeSubcategorySlug={activeSubcategory}
+        activeTertiarySlug={activeTertiaryCategory}
+        activePath={currentPath}
       />
 
-      {/* Curated Collections */}
-      <CuratedCollections onQuickView={handleOpenQuickView} />
+      {/* Main View Router */}
+      {isCategoryOrNewArrivals ? (
+        /* DEDICATED REUSABLE DYNAMIC CATEGORY PAGE */
+        <CategoryPage 
+          categoryInfo={currentCategoryInfo}
+          products={storeData.products}
+          onAddToCart={handleAddToCart}
+          onQuickView={handleOpenQuickView}
+          wishlist={wishlist}
+          onToggleWishlist={handleToggleWishlist}
+          onNavigate={handleNavigate}
+          isNewArrivals={currentPath === '/new-arrivals'}
+        />
+      ) : (
+        /* HOME LANDING PAGE */
+        <>
+          <main className="mockup-canvas" id="home">
+            <Hero 
+              featuredProduct={storeData.products[0]}
+              onQuickView={handleOpenQuickView}
+              onExplore={handleExplore}
+            />
+          </main>
 
-      {/* Brand Story & Sustainability */}
-      <BrandStory />
+          <ProductCatalog 
+            categories={storeData.categories}
+            products={storeData.products}
+            onAddToCart={handleAddToCart}
+            onQuickView={handleOpenQuickView}
+            wishlist={wishlist}
+            onToggleWishlist={handleToggleWishlist}
+            activeCategory={activeCategory}
+            activeSubcategory={activeSubcategory}
+            activeTertiaryCategory={activeTertiaryCategory}
+            onCategoryChange={handleCategoryChange}
+          />
 
-      {/* Reviews & Social Proof */}
-      <Reviews testimonials={storeData.testimonials} />
+          <CuratedCollections onQuickView={handleOpenQuickView} />
 
-      {/* Newsletter */}
-      <Newsletter onSubscribe={(email) => addToast('💌 Welcome to VIP Club! Use code DORCASS20 for 20% OFF')} />
+          <BrandStory />
 
-      {/* Footer */}
-      <Footer />
+          <Reviews testimonials={storeData.testimonials} />
 
-      {/* Modals & Overlays */}
+          <Newsletter onSubscribe={(email) => addToast('💌 Welcome to VIP Club! Use code DORCASS20 for 20% OFF')} />
+        </>
+      )}
+
+      {/* Global Footer */}
+      <Footer onNavigate={handleNavigate} />
+
+      {/* Global Modals & Overlays */}
       <CartDrawer 
         isOpen={isCartOpen}
         onClose={() => setIsCartOpen(false)}
@@ -219,8 +339,10 @@ export function App() {
       />
 
       <Toast toasts={toasts} />
+      <WhatsAppFloatingBtn />
     </div>
   );
 }
 
 export default App;
+
