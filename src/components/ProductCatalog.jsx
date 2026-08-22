@@ -167,10 +167,17 @@ export const ProductCatalog = ({
                   <h3 className="product-title">{product.title}</h3>
                   <p className="product-sub">{product.subtitle}</p>
                   
-                  <div className="product-price-row">
+                    <div className="product-price-row">
                     <div className="price-container">
-                      <span className="current-price">₹{product.price.toFixed(2)}</span>
-                      <span className="original-price">₹{product.originalPrice.toFixed(2)}</span>
+                      <span className="current-price">₹{Number(product.price || 0).toFixed(2)}</span>
+                      {product.originalPrice ? (
+                        <span className="original-price">₹{Number(product.originalPrice).toFixed(2)}</span>
+                      ) : null}
+                      {product.discount ? (
+                        <span className="discount-tag" style={{ marginLeft: '6px', fontSize: '0.75rem', color: 'var(--brand-pink-primary)', background: '#FFE8EF', padding: '2px 6px', borderRadius: '8px', fontWeight: 700 }}>
+                          {product.discount}
+                        </span>
+                      ) : null}
                     </div>
                     
                     <button 
@@ -198,14 +205,23 @@ export const ProductCatalog = ({
             <circle cx="12" cy="12" r="10"></circle>
             <path d="M8 12h8"></path>
           </svg>
-          <h3>New collection pieces arriving soon!</h3>
-          <p>We are currently curating more handcrafted pieces for this selection.</p>
-          <button 
-            className="empty-state-reset-btn"
-            onClick={() => onCategoryChange && onCategoryChange('all', null, null)}
-          >
-            Explore All Collections
-          </button>
+          {products.length === 0 ? (
+            <>
+              <h3>No products available yet.</h3>
+              <p>Our master artisans and stylists are preparing new luxury arrivals. Please check back soon!</p>
+            </>
+          ) : (
+            <>
+              <h3>No products available in this category yet.</h3>
+              <p>We are currently curating more handcrafted pieces for this selection.</p>
+              <button 
+                className="empty-state-reset-btn"
+                onClick={() => onCategoryChange && onCategoryChange('all', null, null)}
+              >
+                Explore All Collections
+              </button>
+            </>
+          )}
         </div>
       )}
     </section>

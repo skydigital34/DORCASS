@@ -76,7 +76,7 @@ export const Hero = ({ featuredProduct, onQuickView, onExplore }) => {
            ========================================== */}
       <div className="hero-right-content">
         <FeatureBadges />
-        <FeaturedLookCard product={featuredProduct} onQuickView={onQuickView} />
+        {featuredProduct && <FeaturedLookCard product={featuredProduct} onQuickView={onQuickView} />}
       </div>
     </section>
   );

@@ -16,10 +16,11 @@ export const SearchOverlay = ({ isOpen, onClose, products, onQuickView }) => {
 
   if (!isOpen) return null;
 
-  const results = query.trim() ? products.filter(p => 
-    p.title.toLowerCase().includes(query.toLowerCase()) ||
-    p.subtitle.toLowerCase().includes(query.toLowerCase()) ||
-    p.description.toLowerCase().includes(query.toLowerCase())
+  const results = query.trim() ? (products || []).filter(p => 
+    p.title?.toLowerCase().includes(query.toLowerCase()) ||
+    p.subtitle?.toLowerCase().includes(query.toLowerCase()) ||
+    p.description?.toLowerCase().includes(query.toLowerCase()) ||
+    p.category?.toLowerCase().includes(query.toLowerCase())
   ) : [];
 
   return (
@@ -91,7 +92,7 @@ export const SearchOverlay = ({ isOpen, onClose, products, onQuickView }) => {
                 <img src={p.image} alt={p.title} style={{ width: '50px', height: '50px', borderRadius: '10px', objectFit: 'cover' }} />
                 <div>
                   <div style={{ fontWeight: 700, fontSize: '0.95rem', color: 'var(--text-main)' }}>{p.title}</div>
-                  <div style={{ fontWeight: 700, color: 'var(--brand-pink-deep)', fontSize: '0.9rem' }}>₹{p.price.toFixed(2)}</div>
+                  <div style={{ fontWeight: 700, color: 'var(--brand-pink-deep)', fontSize: '0.9rem' }}>₹{Number(p.price || 0).toFixed(2)}</div>
                 </div>
               </div>
             ))

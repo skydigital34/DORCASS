@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { CATEGORIES_DATA } from '../data/categoriesData';
+import { getStoredCategories, subscribeToStore } from '../services/storeService';
 
 export const CategoryDropdown = ({ 
   isOpen, 
@@ -9,8 +9,18 @@ export const CategoryDropdown = ({
   activeSubcategorySlug,
   activeTertiarySlug 
 }) => {
-  const [hoveredCategory, setHoveredCategory] = useState(CATEGORIES_DATA[0]);
+  const [categoriesList, setCategoriesList] = useState(getStoredCategories());
+  const [hoveredCategory, setHoveredCategory] = useState(categoriesList[0]);
   const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    const syncCats = () => {
+      const cats = getStoredCategories();
+      setCategoriesList(cats);
+    };
+    const unsubscribe = subscribeToStore(syncCats);
+    return () => unsubscribe();
+  }, []);
 
   // Close on Escape or click outside
   useEffect(() => {
@@ -39,14 +49,14 @@ export const CategoryDropdown = ({
   // Reset hovered category on open to the active category or first category
   useEffect(() => {
     if (isOpen) {
-      const current = CATEGORIES_DATA.find(c => c.slug === activeCategorySlug);
+      const current = categoriesList.find(c => c.slug === activeCategorySlug);
       if (current) {
         setHoveredCategory(current);
       } else {
-        setHoveredCategory(CATEGORIES_DATA[0]);
+        setHoveredCategory(categoriesList[0]);
       }
     }
-  }, [isOpen, activeCategorySlug]);
+  }, [isOpen, activeCategorySlug, categoriesList]);
 
   if (!isOpen) return null;
 
@@ -119,7 +129,7 @@ export const CategoryDropdown = ({
           </div>
 
           <ul className="dropdown-cat-list" role="none">
-            {CATEGORIES_DATA.map((cat, idx) => {
+            {categoriesList.map((cat, idx) => {
               const isSelected = hoveredCategory?.id === cat.id;
               const isActiveRoute = activeCategorySlug === cat.slug;
               const hasKids = cat.children && cat.children.length > 0;

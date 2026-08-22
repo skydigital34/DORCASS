@@ -18,26 +18,33 @@ import { QuickViewModal } from './components/QuickViewModal';
 import { SearchOverlay } from './components/SearchOverlay';
 import { Toast } from './components/Toast';
 import { WhatsAppFloatingBtn } from './components/WhatsAppFloatingBtn';
+import { generateCartWhatsAppUrl } from './utils/whatsapp';
+import { AdminPortal } from './admin/AdminPortal';
+import { getStoredProducts, getStoredCategories, subscribeToStore } from './services/storeService';
 
 export function App() {
+  // Live Store & Inventory State
+  const [products, setProducts] = useState(getStoredProducts());
+  const [categories, setCategories] = useState(getStoredCategories());
+
+  // Subscribe to live store updates across admin & storefront
+  useEffect(() => {
+    const syncStore = () => {
+      setProducts(getStoredProducts());
+      setCategories(getStoredCategories());
+    };
+    const unsubscribe = subscribeToStore(syncStore);
+    return () => unsubscribe();
+  }, []);
+
   // Navigation & Category Filtering State
   const [currentPath, setCurrentPath] = useState(window.location.pathname || '/');
   const [activeCategory, setActiveCategory] = useState('all');
   const [activeSubcategory, setActiveSubcategory] = useState(null);
   const [activeTertiaryCategory, setActiveTertiaryCategory] = useState(null);
 
-  // Cart State (Initialized with 1 item matching mockup)
-  const [cart, setCart] = useState([
-    {
-      id: 'prod-saree-chennur',
-      title: 'Elegant Saree - Rose Chennur Silk',
-      price: 1299.00,
-      image: '/assets/images/featured-saree.jpg',
-      size: 'Free Size',
-      color: 'Blush Rose',
-      quantity: 1
-    }
-  ]);
+  // Cart State (Initialized with 0 items)
+  const [cart, setCart] = useState([]);
 
   const [wishlist, setWishlist] = useState(new Set());
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -192,11 +199,12 @@ export function App() {
     addToast('Item removed from shopping bag');
   };
 
-  // Checkout handler
+  // Checkout handler (Redirects to WhatsApp with cart details)
   const handleCheckout = () => {
     if (cart.length === 0) return;
-    addToast('🎉 Order placed successfully! Thank you for choosing DORCASS.');
-    setCart([]);
+    const whatsappUrl = generateCartWhatsAppUrl(cart);
+    window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
+    addToast('Redirecting to WhatsApp with your order details...');
     setIsCartOpen(false);
   };
 
@@ -217,8 +225,10 @@ export function App() {
 
   // Quick view opener
   const handleOpenQuickView = (productId) => {
-    const product = storeData.products.find(p => p.id === productId) || storeData.products[0];
-    setQuickViewProduct(product);
+    const product = products.find(p => p.id === productId) || products[0] || null;
+    if (product) {
+      setQuickViewProduct(product);
+    }
   };
 
   const handleCloseQuickView = () => {
@@ -238,13 +248,27 @@ export function App() {
 
   const cartTotalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
 
-  // Determine current page view: Home vs CategoryPage
+  // Determine current page view
+  const isAdminRoute = currentPath === '/admin' || currentPath.startsWith('/admin');
   const isHomePage = currentPath === '/' || currentPath === '/home';
   const isAboutPage = currentPath === '/about';
   const isContactPage = currentPath === '/contact';
-  const isCategoryOrNewArrivals = !isHomePage && !isAboutPage && !isContactPage;
+  const isCategoryOrNewArrivals = !isHomePage && !isAboutPage && !isContactPage && !isAdminRoute;
 
   const currentCategoryInfo = resolveNavigationFromPath(currentPath);
+
+  // If in Admin Portal, render dedicated Admin Area
+  if (isAdminRoute) {
+    return (
+      <>
+        <AdminPortal 
+          onNavigateStore={() => handleNavigate({ path: '/' })} 
+          onToast={addToast} 
+        />
+        <Toast toasts={toasts} />
+      </>
+    );
+  }
 
   return (
     <div className="site-wrapper">
@@ -266,7 +290,7 @@ export function App() {
         /* DEDICATED REUSABLE DYNAMIC CATEGORY PAGE */
         <CategoryPage 
           categoryInfo={currentCategoryInfo}
-          products={storeData.products}
+          products={products}
           onAddToCart={handleAddToCart}
           onQuickView={handleOpenQuickView}
           wishlist={wishlist}
@@ -279,15 +303,15 @@ export function App() {
         <>
           <main className="mockup-canvas" id="home">
             <Hero 
-              featuredProduct={storeData.products[0]}
+              featuredProduct={products[0] || null}
               onQuickView={handleOpenQuickView}
               onExplore={handleExplore}
             />
           </main>
 
           <ProductCatalog 
-            categories={storeData.categories}
-            products={storeData.products}
+            categories={categories}
+            products={products}
             onAddToCart={handleAddToCart}
             onQuickView={handleOpenQuickView}
             wishlist={wishlist}
@@ -298,7 +322,7 @@ export function App() {
             onCategoryChange={handleCategoryChange}
           />
 
-          <CuratedCollections onQuickView={handleOpenQuickView} />
+          <CuratedCollections onNavigate={handleNavigate} />
 
           <BrandStory />
 
@@ -334,7 +358,7 @@ export function App() {
       <SearchOverlay 
         isOpen={isSearchOpen}
         onClose={() => setIsSearchOpen(false)}
-        products={storeData.products}
+        products={products}
         onQuickView={handleOpenQuickView}
       />
 

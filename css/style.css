@@ -244,6 +244,10 @@ a {
   opacity: 0.8;
 }
 
+.mobile-menu-btn {
+  display: none;
+}
+
 /* Header Right Actions */
 .header-actions {
   display: flex;

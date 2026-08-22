@@ -1,6 +1,7 @@
 import React from 'react';
 
 export const FeaturedLookCard = ({ product, onQuickView }) => {
+  if (!product) return null;
   return (
     <div 
       className="featured-look-floating-card" 
@@ -26,7 +27,7 @@ export const FeaturedLookCard = ({ product, onQuickView }) => {
           <line x1="3" y1="6" x2="21" y2="6"></line>
           <path d="M16 10a4 4 0 0 1-8 0"></path>
         </svg>
-        <span>₹{product.price.toFixed(2)}</span>
+        <span>₹{Number(product.price || 0).toFixed(2)}</span>
       </button>
     </div>
   );

@@ -36,23 +36,50 @@ export const Header = ({
     setIsDropdownOpen(prev => !prev);
   };
 
+  const clickCountRef = useRef(0);
+  const clickTimerRef = useRef(null);
+
   const handleDirectNav = (e, path, sectionId, category = null, subcategory = null, tertiaryCategory = null) => {
-    e.preventDefault();
+    if (e && e.preventDefault) e.preventDefault();
     setIsDropdownOpen(false);
     if (onNavigate) {
       onNavigate({ path, sectionId, category, subcategory, tertiaryCategory });
     }
   };
 
+  // Hidden triple-click trigger for Admin Portal
+  const handleLogoClick = (e) => {
+    e.preventDefault();
+    clickCountRef.current += 1;
+
+    if (clickTimerRef.current) {
+      clearTimeout(clickTimerRef.current);
+    }
+
+    if (clickCountRef.current === 3) {
+      clickCountRef.current = 0;
+      if (onNavigate) {
+        onNavigate({ path: '/admin' });
+      }
+      return;
+    }
+
+    // Normal click timeout window
+    clickTimerRef.current = setTimeout(() => {
+      handleDirectNav(null, '/', 'home', 'all', null, null);
+      clickCountRef.current = 0;
+    }, 500);
+  };
+
   return (
     <>
       <header className="main-header" role="banner">
         <div className="header-container">
-          {/* Left Brand Logo (Takes to Home) */}
+          {/* Left Brand Logo (Triple-click opens Admin Portal, single click takes to Home) */}
           <a 
             href="/" 
             className="brand-logo-container" 
-            onClick={(e) => handleDirectNav(e, '/', 'home', 'all', null, null)}
+            onClick={handleLogoClick}
             aria-label="DORCASS Home"
           >
             <span className="brand-name">DORCASS</span>

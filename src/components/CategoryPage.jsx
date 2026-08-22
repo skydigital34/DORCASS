@@ -711,10 +711,10 @@ export const CategoryPage = ({
                     
                     <div className="product-price-row">
                       <div className="price-container">
-                        <span className="current-price">₹{product.price.toFixed(2)}</span>
-                        {product.originalPrice && (
-                          <span className="original-price">₹{product.originalPrice.toFixed(2)}</span>
-                        )}
+                        <span className="current-price">₹{Number(product.price || 0).toFixed(2)}</span>
+                        {product.originalPrice ? (
+                          <span className="original-price">₹{Number(product.originalPrice).toFixed(2)}</span>
+                        ) : null}
                         {product.discount && (
                           <span className="discount-tag">{product.discount}</span>
                         )}

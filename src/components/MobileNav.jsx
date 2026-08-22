@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { CATEGORIES_DATA } from '../data/categoriesData';
+import { getStoredCategories, subscribeToStore } from '../services/storeService';
 
 export const MobileNav = ({ 
   isOpen, 
@@ -10,8 +10,17 @@ export const MobileNav = ({
   activeTertiarySlug,
   activePath 
 }) => {
+  const [categoriesList, setCategoriesList] = useState(getStoredCategories());
   const [isCategoriesExpanded, setIsCategoriesExpanded] = useState(true);
   const [expandedSubmenus, setExpandedSubmenus] = useState({});
+
+  useEffect(() => {
+    const syncCats = () => {
+      setCategoriesList(getStoredCategories());
+    };
+    const unsubscribe = subscribeToStore(syncCats);
+    return () => unsubscribe();
+  }, []);
 
   // Auto-expand active category & subcategory on open
   useEffect(() => {
@@ -58,6 +67,28 @@ export const MobileNav = ({
     onClose();
   };
 
+  const mobileClickCountRef = React.useRef(0);
+  const mobileClickTimerRef = React.useRef(null);
+
+  const handleMobileLogoClick = () => {
+    mobileClickCountRef.current += 1;
+
+    if (mobileClickTimerRef.current) {
+      clearTimeout(mobileClickTimerRef.current);
+    }
+
+    if (mobileClickCountRef.current === 3) {
+      mobileClickCountRef.current = 0;
+      handleNavClick('/admin', null);
+      return;
+    }
+
+    mobileClickTimerRef.current = setTimeout(() => {
+      handleNavClick('/', 'home', 'all', null, null);
+      mobileClickCountRef.current = 0;
+    }, 500);
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -67,7 +98,7 @@ export const MobileNav = ({
         <div className="mobile-nav-header">
           <div 
             className="mobile-nav-brand"
-            onClick={() => handleNavClick('/', 'home', 'all', null, null)}
+            onClick={handleMobileLogoClick}
             style={{ cursor: 'pointer' }}
             role="button"
             tabIndex={0}
@@ -138,7 +169,7 @@ export const MobileNav = ({
               {/* Collapsible Categories Tree */}
               {isCategoriesExpanded && (
                 <ul className="mobile-sub-tree">
-                  {CATEGORIES_DATA.map((cat) => {
+                  {categoriesList.map((cat) => {
                     const hasChildren = cat.children && cat.children.length > 0;
                     const isCatExpanded = !!expandedSubmenus[cat.slug];
                     const isCatActive = activeCategorySlug === cat.slug && !activeSubcategorySlug && !activeTertiarySlug;
