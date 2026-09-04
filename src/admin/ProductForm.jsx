@@ -1,4 +1,8 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
+import { isFirebaseConfigured } from '../services/firebase';
+import { uploadImageToCloudinary, isCloudinaryConfigured } from '../services/cloudinary';
+
+const STANDARD_SIZES = ['S', 'M', 'L', 'XL', 'XXL', 'XXXL', 'Free Size'];
 
 export const ProductForm = ({ 
   product = null, 
@@ -7,6 +11,7 @@ export const ProductForm = ({
   onCancel 
 }) => {
   const isEditing = !!product;
+  const fileInputRef = useRef(null);
 
   // Form State
   const [formData, setFormData] = useState({
@@ -27,10 +32,16 @@ export const ProductForm = ({
     images: ['']
   });
 
-  // Image load error tracking { [index]: true }
+  // Custom size input state
+  const [customSizeInput, setCustomSizeInput] = useState('');
+
+  // Image upload states
+  const [uploadProgress, setUploadProgress] = useState({}); // { [index]: percentage }
+  const [isUploading, setIsUploading] = useState(false);
   const [imageErrors, setImageErrors] = useState({});
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDragOver, setIsDragOver] = useState(false);
 
   // Initialize form when editing
   useEffect(() => {
@@ -75,12 +86,12 @@ export const ProductForm = ({
     return availableSubcategories.find(s => s.slug === formData.subcategory);
   }, [availableSubcategories, formData.subcategory]);
 
-  // Available Tertiary Subcategories (e.g. Accessories -> Anti turnis -> Chains)
+  // Available Tertiary Subcategories
   const availableTertiaryCategories = useMemo(() => {
     return currentSubcategoryObj?.children || [];
   }, [currentSubcategoryObj]);
 
-  // Handle Category Change (Resets subcategories)
+  // Handle Category Change
   const handleCategoryChange = (e) => {
     const newCat = e.target.value;
     const catObj = categories.find(c => c.slug === newCat);
@@ -109,13 +120,59 @@ export const ProductForm = ({
     }));
   };
 
+  // Size Management Handlers
+  const handleToggleSize = (size) => {
+    setFormData(prev => {
+      const currentSizes = prev.sizes || [];
+      if (currentSizes.includes(size)) {
+        const remaining = currentSizes.filter(s => s !== size);
+        return { ...prev, sizes: remaining.length > 0 ? remaining : ['Free Size'] };
+      } else {
+        // If 'Free Size' was the only one and user clicks S, replace or add
+        const updated = currentSizes.filter(s => s !== 'Free Size');
+        return { ...prev, sizes: size === 'Free Size' ? ['Free Size'] : [...updated, size] };
+      }
+    });
+  };
+
+  const handleAddCustomSize = (e) => {
+    if (e) e.preventDefault();
+    const val = customSizeInput.trim();
+    if (!val) return;
+
+    setFormData(prev => {
+      const currentSizes = prev.sizes || [];
+      if (currentSizes.includes(val)) return prev;
+      return {
+        ...prev,
+        sizes: [...currentSizes.filter(s => s !== 'Free Size'), val]
+      };
+    });
+    setCustomSizeInput('');
+  };
+
+  const handleRemoveSize = (sizeToRemove) => {
+    setFormData(prev => {
+      const remaining = (prev.sizes || []).filter(s => s !== sizeToRemove);
+      return {
+        ...prev,
+        sizes: remaining.length > 0 ? remaining : ['Free Size']
+      };
+    });
+  };
+
+  const handleSetStandardClothingSizes = () => {
+    setFormData(prev => ({
+      ...prev,
+      sizes: ['S', 'M', 'L', 'XL', 'XXL', 'XXXL']
+    }));
+  };
+
   // Image Management
   const handleImageChange = (index, value) => {
     const updated = [...formData.images];
     updated[index] = value;
     setFormData(prev => ({ ...prev, images: updated }));
-
-    // Reset error for this index
     setImageErrors(prev => ({ ...prev, [index]: false }));
   };
 
@@ -141,6 +198,55 @@ export const ProductForm = ({
     const item = updated.splice(fromIndex, 1)[0];
     updated.splice(toIndex, 0, item);
     setFormData(prev => ({ ...prev, images: updated }));
+  };
+
+  // File Upload Handler (Direct Cloudinary Upload)
+  const handleFileUpload = async (files) => {
+    if (!files || files.length === 0) return;
+    setIsUploading(true);
+    setErrors(prev => ({ ...prev, images: null }));
+    const existing = formData.images.filter(img => img && img.trim().length > 0);
+    const newImages = [...existing];
+
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      const targetIndex = newImages.length;
+      setUploadProgress(prev => ({ ...prev, [targetIndex]: 15 }));
+
+      try {
+        const cloudinaryUrl = await uploadImageToCloudinary(file, (progress) => {
+          setUploadProgress(prev => ({ ...prev, [targetIndex]: progress }));
+        });
+        if (cloudinaryUrl) {
+          newImages.push(cloudinaryUrl);
+        }
+      } catch (err) {
+        console.warn('Cloudinary upload warning:', err);
+        setErrors(prev => ({
+          ...prev,
+          images: `Upload error: ${err.message}`
+        }));
+      }
+    }
+
+    if (newImages.length === 0) {
+      newImages.push('');
+    }
+
+    setFormData(prev => ({ ...prev, images: newImages }));
+    setIsUploading(false);
+    setUploadProgress({});
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setIsDragOver(false);
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      handleFileUpload(Array.from(e.dataTransfer.files));
+    }
   };
 
   // Validation
@@ -169,13 +275,7 @@ export const ProductForm = ({
 
     const validImages = formData.images.filter(img => img && img.trim().length > 0);
     if (validImages.length === 0) {
-      newErrors.images = 'At least one product image URL or path is required.';
-    } else {
-      // Validate URLs or paths
-      const invalidUrl = validImages.find(img => !/^(https?:\/\/|\/|\.\/|data:)/i.test(img.trim()));
-      if (invalidUrl) {
-        newErrors.images = 'All entered image URLs must start with https://, http://, or /assets/...';
-      }
+      newErrors.images = 'Please upload at least one image or provide an image URL.';
     }
 
     setErrors(newErrors);
@@ -193,7 +293,8 @@ export const ProductForm = ({
         price: Number(formData.price),
         originalPrice: formData.originalPrice ? Number(formData.originalPrice) : null,
         stock: parseInt(formData.stock, 10),
-        images: formData.images.filter(img => img && img.trim().length > 0)
+        images: formData.images.filter(img => img && img.trim().length > 0),
+        sizes: formData.sizes && formData.sizes.length > 0 ? formData.sizes : ['Free Size']
       });
     } catch (err) {
       setErrors(prev => ({ ...prev, submit: err.message || 'Failed to save product.' }));
@@ -207,19 +308,19 @@ export const ProductForm = ({
       <div className="admin-page-header">
         <div>
           <h1 className="admin-page-title">
-            {isEditing ? `Edit Product: ${product.title}` : 'Add New Luxury Piece'}
+            {isEditing ? `Edit Product: ${product.title}` : 'Add New Product'}
           </h1>
           <p className="admin-page-subtitle">
-            Provide product information, category assignment, and Cloudinary media links.
+            Configure product details, pricing, Cloudinary images, sizes (S - XXXL), and stock.
           </p>
         </div>
 
         <div style={{ display: 'flex', gap: '10px' }}>
-          <button type="button" className="admin-btn-secondary" onClick={onCancel} disabled={isSubmitting}>
+          <button type="button" className="admin-btn-secondary" onClick={onCancel} disabled={isSubmitting || isUploading}>
             Cancel
           </button>
-          <button type="button" className="admin-btn-primary" onClick={handleSubmit} disabled={isSubmitting}>
-            {isSubmitting ? 'Saving...' : isEditing ? 'Save Changes' : 'Create Product'}
+          <button type="button" className="admin-btn-primary" onClick={handleSubmit} disabled={isSubmitting || isUploading}>
+            {isSubmitting ? 'Saving to Firebase...' : isEditing ? 'Save Changes' : 'Publish Product'}
           </button>
         </div>
       </div>
@@ -241,9 +342,9 @@ export const ProductForm = ({
 
       <form onSubmit={handleSubmit}>
         <div className="admin-form-grid">
-          {/* Left Column: Core Details */}
+          {/* Left Column: Product Information & Image Upload */}
           <div>
-            {/* Basic Information */}
+            {/* 1. Basic Information */}
             <div className="admin-form-section">
               <h2 className="admin-form-section-title">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -253,7 +354,7 @@ export const ProductForm = ({
                   <line x1="16" y1="17" x2="8" y2="17"></line>
                   <polyline points="10 9 9 9 8 9"></polyline>
                 </svg>
-                <span>Product Information</span>
+                <span>Product Name & Details</span>
               </h2>
 
               <div className="admin-form-group">
@@ -263,7 +364,7 @@ export const ProductForm = ({
                 <input 
                   type="text" 
                   className="admin-input-text" 
-                  placeholder="e.g. Elegant Saree - Rose Chennur Silk"
+                  placeholder="e.g. Royal Pink Kanchipuram Silk Saree"
                   value={formData.title}
                   onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
                 />
@@ -271,24 +372,30 @@ export const ProductForm = ({
               </div>
 
               <div className="admin-form-group">
-                <label className="admin-label">Subtitle / Highlight Tag</label>
+                <label className="admin-label">Subtitle / Key Highlight</label>
                 <input 
                   type="text" 
                   className="admin-input-text" 
-                  placeholder="e.g. Timeless Beauty • South Indian Royal Weave"
+                  placeholder="e.g. Handcrafted Pure Zari Weave • Luxury Bridal Collection"
                   value={formData.subtitle}
                   onChange={(e) => setFormData(prev => ({ ...prev, subtitle: e.target.value }))}
                 />
               </div>
 
               <div className="admin-form-group">
-                <label className="admin-label">Description</label>
+                <label className="admin-label">
+                  Description <span className="req">*</span>
+                </label>
                 <textarea 
                   className="admin-textarea" 
-                  placeholder="Describe the fabric weave, craftsmanship, styling notes, and occasion suitability..."
+                  style={{ minHeight: '130px' }}
+                  placeholder="Enter detailed description: fabric weave, borders, zari work, styling recommendations, wash care, and occasion suitability..."
                   value={formData.description}
                   onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
                 />
+                <span style={{ fontSize: '0.75rem', color: 'var(--admin-text-muted)', display: 'block', marginTop: '4px' }}>
+                  {formData.description.length} characters • Saved securely in Firebase Firestore
+                </span>
               </div>
 
               <div className="admin-form-row">
@@ -297,7 +404,7 @@ export const ProductForm = ({
                   <input 
                     type="text" 
                     className="admin-input-text" 
-                    placeholder="e.g. 100% Pure Mulberry Silk"
+                    placeholder="e.g. 100% Pure Mulberry Silk / Anti-Tarnish Brass"
                     value={formData.fabric}
                     onChange={(e) => setFormData(prev => ({ ...prev, fabric: e.target.value }))}
                   />
@@ -308,7 +415,7 @@ export const ProductForm = ({
                   <input 
                     type="text" 
                     className="admin-input-text" 
-                    placeholder="e.g. Bestseller, New Arrival"
+                    placeholder="e.g. Bestseller, New Arrival, Limited Edition"
                     value={formData.badge}
                     onChange={(e) => setFormData(prev => ({ ...prev, badge: e.target.value }))}
                   />
@@ -316,20 +423,211 @@ export const ProductForm = ({
               </div>
             </div>
 
-            {/* Cloudinary Image Manager */}
+            {/* 2. Sizes Management (S, M, L, XL, XXL, XXXL, Custom) */}
             <div className="admin-form-section">
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px', flexWrap: 'wrap', gap: '8px' }}>
+                <h2 className="admin-form-section-title" style={{ margin: 0 }}>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M20.38 3.46L16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"></path>
+                  </svg>
+                  <span>Available Sizes (S, M, L, XL, XXL, XXXL)</span>
+                </h2>
+                <button 
+                  type="button" 
+                  onClick={handleSetStandardClothingSizes}
+                  style={{
+                    background: 'none',
+                    border: '1px solid var(--admin-pink)',
+                    color: 'var(--admin-pink)',
+                    borderRadius: '20px',
+                    padding: '3px 10px',
+                    fontSize: '0.75rem',
+                    fontWeight: 700,
+                    cursor: 'pointer'
+                  }}
+                >
+                  + Select All (S to XXXL)
+                </button>
+              </div>
+
+              <p style={{ fontSize: '0.82rem', color: 'var(--admin-text-muted)', marginBottom: '14px' }}>
+                Click size buttons to toggle them ON/OFF, or add custom sizes below:
+              </p>
+
+              {/* Standard Size Buttons */}
+              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '16px' }}>
+                {STANDARD_SIZES.map(s => {
+                  const isSelected = (formData.sizes || []).includes(s);
+                  return (
+                    <button
+                      key={s}
+                      type="button"
+                      onClick={() => handleToggleSize(s)}
+                      style={{
+                        padding: '8px 16px',
+                        borderRadius: '8px',
+                        border: isSelected ? '2px solid var(--admin-pink)' : '1px solid var(--admin-border)',
+                        background: isSelected ? 'var(--admin-pink-subtle)' : '#FFFFFF',
+                        color: isSelected ? 'var(--admin-pink-deep)' : 'var(--admin-text-main)',
+                        fontWeight: isSelected ? 800 : 600,
+                        fontSize: '0.88rem',
+                        cursor: 'pointer',
+                        transition: 'all 0.15s ease'
+                      }}
+                    >
+                      {isSelected ? `✓ ${s}` : s}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Custom Size Adder */}
+              <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginBottom: '14px' }}>
+                <input 
+                  type="text" 
+                  className="admin-input-text" 
+                  placeholder="Type custom size (e.g. 28, 30, 32, 40, XS, 4XL)..."
+                  value={customSizeInput}
+                  onChange={(e) => setCustomSizeInput(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAddCustomSize(); } }}
+                  style={{ maxWidth: '320px' }}
+                />
+                <button 
+                  type="button" 
+                  className="admin-btn-secondary" 
+                  onClick={handleAddCustomSize}
+                  style={{ padding: '8px 14px', fontSize: '0.84rem' }}
+                >
+                  + Add Custom Size
+                </button>
+              </div>
+
+              {/* Active Selected Sizes List */}
+              <div style={{ background: '#FCF8F9', border: '1px solid var(--admin-border)', borderRadius: '8px', padding: '10px 14px' }}>
+                <span style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--admin-text-muted)', textTransform: 'uppercase', display: 'block', marginBottom: '8px' }}>
+                  Active Sizes on Storefront:
+                </span>
+                <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                  {(formData.sizes || []).map(size => (
+                    <span 
+                      key={size}
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        background: '#FFFFFF',
+                        border: '1px solid var(--admin-border)',
+                        borderRadius: '20px',
+                        padding: '4px 10px',
+                        fontSize: '0.82rem',
+                        fontWeight: 700,
+                        color: 'var(--admin-text-main)'
+                      }}
+                    >
+                      {size}
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveSize(size)}
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          color: 'var(--admin-danger)',
+                          cursor: 'pointer',
+                          padding: 0,
+                          fontSize: '0.9rem',
+                          fontWeight: 'bold',
+                          lineHeight: 1
+                        }}
+                        title={`Remove ${size}`}
+                      >
+                        ✕
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* 3. Cloudinary Image Upload & Media Manager */}
+            <div className="admin-form-section">
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', flexWrap: 'wrap', gap: '8px' }}>
                 <h2 className="admin-form-section-title" style={{ margin: 0 }}>
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
                     <circle cx="8.5" cy="8.5" r="1.5"></circle>
                     <polyline points="21 15 16 10 5 21"></polyline>
                   </svg>
-                  <span>Cloudinary Product Images</span>
+                  <span>Product Images (Cloudinary Upload)</span>
                 </h2>
-                <span style={{ fontSize: '0.78rem', color: 'var(--admin-text-muted)' }}>
-                  External URLs only • Primary image first
+                <span style={{ 
+                  fontSize: '0.78rem', 
+                  color: isCloudinaryConfigured() ? 'var(--admin-success)' : 'var(--admin-pink-deep)',
+                  fontWeight: 700,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px'
+                }}>
+                  <span style={{ 
+                    width: '6px', 
+                    height: '6px', 
+                    borderRadius: '50%', 
+                    background: isCloudinaryConfigured() ? 'var(--admin-success)' : 'var(--admin-pink-deep)' 
+                  }}></span>
+                  Cloudinary: {isCloudinaryConfigured() ? 'nlog05bi (dorcass)' : 'Active'}
                 </span>
+              </div>
+
+              {/* Direct File Dropzone / Uploader */}
+              <div 
+                className={`admin-dropzone ${isDragOver ? 'is-dragover' : ''}`}
+                onDragOver={(e) => { e.preventDefault(); setIsDragOver(true); }}
+                onDragLeave={() => setIsDragOver(false)}
+                onDrop={handleDrop}
+                onClick={() => fileInputRef.current?.click()}
+                style={{
+                  border: '2px dashed var(--admin-pink)',
+                  borderRadius: 'var(--admin-radius-md)',
+                  background: isDragOver ? 'var(--admin-pink-subtle)' : '#FCF8F9',
+                  padding: '24px 16px',
+                  textAlign: 'center',
+                  cursor: 'pointer',
+                  marginBottom: '18px',
+                  transition: 'all 0.2s ease'
+                }}
+              >
+                <input 
+                  type="file" 
+                  ref={fileInputRef} 
+                  onChange={(e) => handleFileUpload(Array.from(e.target.files || []))}
+                  multiple 
+                  accept="image/*" 
+                  style={{ display: 'none' }} 
+                />
+                
+                <div style={{
+                  width: '46px',
+                  height: '46px',
+                  borderRadius: '50%',
+                  background: 'var(--admin-pink-subtle)',
+                  color: 'var(--admin-pink)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  margin: '0 auto 10px'
+                }}>
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="17 8 12 3 7 8"></polyline>
+                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                  </svg>
+                </div>
+
+                <div style={{ fontWeight: 700, fontSize: '0.95rem', color: 'var(--admin-text-main)', marginBottom: '4px' }}>
+                  {isUploading ? 'Uploading to Cloudinary...' : 'Click to Upload PNG/JPG Image Files or Drag & Drop'}
+                </div>
+                <div style={{ fontSize: '0.8rem', color: 'var(--admin-text-muted)' }}>
+                  PNG, JPG, JPEG, WEBP • Direct upload to Cloudinary (nlog05bi)
+                </div>
               </div>
 
               {errors.images && (
@@ -338,16 +636,22 @@ export const ProductForm = ({
                 </div>
               )}
 
+              {/* Image List & Preview Stack */}
               <div className="admin-image-stack">
                 {formData.images.map((url, idx) => {
                   const hasError = imageErrors[idx];
                   const hasUrl = url && url.trim().length > 0;
+                  const progress = uploadProgress[idx];
 
                   return (
                     <div className="admin-image-input-item" key={idx}>
                       {/* Live Thumbnail Preview Box */}
                       <div className="admin-image-preview-box">
-                        {hasUrl && !hasError ? (
+                        {progress !== undefined && progress < 100 ? (
+                          <div style={{ textAlign: 'center', padding: '4px', fontSize: '0.72rem', color: 'var(--admin-pink)', fontWeight: 700 }}>
+                            {progress}%
+                          </div>
+                        ) : hasUrl && !hasError ? (
                           <img 
                             src={url} 
                             alt={`Preview ${idx + 1}`}
@@ -356,10 +660,10 @@ export const ProductForm = ({
                           />
                         ) : hasUrl && hasError ? (
                           <div className="admin-image-error-notice">
-                            ⚠️ Unable to load image. Please check the Cloudinary URL.
+                            ⚠️ Invalid URL
                           </div>
                         ) : (
-                          <span style={{ fontSize: '0.75rem', color: 'var(--admin-text-muted)' }}>No URL</span>
+                          <span style={{ fontSize: '0.75rem', color: 'var(--admin-text-muted)' }}>Empty</span>
                         )}
                       </div>
 
@@ -367,7 +671,7 @@ export const ProductForm = ({
                       <div className="admin-image-fields">
                         <div className="admin-image-header">
                           <span className="admin-image-tag">
-                            {idx === 0 ? '★ Primary Image (Cover)' : `Image ${idx + 1}`}
+                            {idx === 0 ? '★ Primary Cover Image' : `Gallery Image ${idx + 1}`}
                           </span>
                           <div style={{ display: 'flex', gap: '4px' }}>
                             {idx > 0 && (
@@ -404,7 +708,7 @@ export const ProductForm = ({
                         <input 
                           type="text" 
                           className="admin-input-text" 
-                          placeholder="https://... or /assets/images/featured-saree.jpg"
+                          placeholder="Cloudinary image URL or direct web link"
                           value={url}
                           onChange={(e) => handleImageChange(idx, e.target.value)}
                         />
@@ -414,13 +718,24 @@ export const ProductForm = ({
                 })}
               </div>
 
-              <button 
-                type="button" 
-                className="admin-add-img-btn"
-                onClick={handleAddImageField}
-              >
-                + Add Another Cloudinary Image URL
-              </button>
+              <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
+                <button 
+                  type="button" 
+                  className="admin-add-img-btn"
+                  onClick={() => fileInputRef.current?.click()}
+                  style={{ flex: 1 }}
+                >
+                  📁 Browse Device File
+                </button>
+                <button 
+                  type="button" 
+                  className="admin-btn-secondary"
+                  onClick={handleAddImageField}
+                  style={{ borderRadius: 'var(--admin-radius-sm)', fontSize: '0.84rem' }}
+                >
+                  + Add URL Field
+                </button>
+              </div>
             </div>
           </div>
 
@@ -437,7 +752,7 @@ export const ProductForm = ({
                   <line x1="3" y1="12" x2="3.01" y2="12"></line>
                   <line x1="3" y1="18" x2="3.01" y2="18"></line>
                 </svg>
-                <span>Category Hierarchy</span>
+                <span>Type Categories</span>
               </h2>
 
               <div className="admin-form-group">
@@ -497,7 +812,7 @@ export const ProductForm = ({
                   <line x1="12" y1="1" x2="12" y2="23"></line>
                   <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
                 </svg>
-                <span>Pricing & Stock</span>
+                <span>Pricing, Stock & Status</span>
               </h2>
 
               <div className="admin-form-group">
@@ -506,7 +821,7 @@ export const ProductForm = ({
                 </label>
                 <input 
                   type="number" 
-                  step="0.01"
+                  step="0.01" 
                   min="0"
                   className="admin-input-text" 
                   placeholder="1299.00"
@@ -520,7 +835,7 @@ export const ProductForm = ({
                 <label className="admin-label">Original MRP (₹)</label>
                 <input 
                   type="number" 
-                  step="0.01"
+                  step="0.01" 
                   min="0"
                   className="admin-input-text" 
                   placeholder="2499.00"
@@ -532,7 +847,7 @@ export const ProductForm = ({
 
               <div className="admin-form-group">
                 <label className="admin-label">
-                  Stock Units <span className="req">*</span>
+                  Stock Count (Units) <span className="req">*</span>
                 </label>
                 <input 
                   type="number" 
@@ -546,7 +861,7 @@ export const ProductForm = ({
               </div>
 
               <div className="admin-form-group">
-                <label className="admin-label">Status</label>
+                <label className="admin-label">Product Status</label>
                 <select 
                   className="admin-select"
                   value={formData.status}
@@ -563,11 +878,11 @@ export const ProductForm = ({
 
         {/* Bottom Bar Actions */}
         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '20px' }}>
-          <button type="button" className="admin-btn-secondary" onClick={onCancel} disabled={isSubmitting}>
+          <button type="button" className="admin-btn-secondary" onClick={onCancel} disabled={isSubmitting || isUploading}>
             Cancel
           </button>
-          <button type="submit" className="admin-btn-primary" disabled={isSubmitting}>
-            {isSubmitting ? 'Saving Product...' : isEditing ? 'Update Product' : 'Publish Product'}
+          <button type="submit" className="admin-btn-primary" disabled={isSubmitting || isUploading}>
+            {isSubmitting ? 'Saving to Firebase...' : isEditing ? 'Update Product' : 'Publish Product'}
           </button>
         </div>
       </form>

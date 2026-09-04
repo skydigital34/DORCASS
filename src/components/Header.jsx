@@ -216,8 +216,30 @@ export const Header = ({
                 </svg>
               </button>
 
-              <button className="user-profile-btn" aria-label="User Profile" title="My Account">
-                <img src={userAvatar || "/assets/images/avatar-1.jpg"} alt="User Profile" />
+              {/* Admin Portal Quick Access */}
+              <button 
+                className="user-profile-btn" 
+                onClick={() => handleDirectNav(null, '/admin', null)} 
+                aria-label="Admin Portal" 
+                title="DORCASS Admin Portal"
+                style={{ position: 'relative' }}
+              >
+                <img src={userAvatar || "/assets/images/avatar-1.jpg"} alt="Admin Portal" />
+                <span style={{
+                  position: 'absolute',
+                  bottom: '-2px',
+                  right: '-2px',
+                  background: 'var(--brand-pink-primary)',
+                  color: '#FFF',
+                  fontSize: '9px',
+                  fontWeight: 'bold',
+                  padding: '1px 4px',
+                  borderRadius: '6px',
+                  border: '1px solid #FFF',
+                  lineHeight: '1'
+                }}>
+                  ADM
+                </span>
               </button>
 
               {/* Cart Pill Button (Outlined pill with cart icon + item count) */}

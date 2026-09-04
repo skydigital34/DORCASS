@@ -5,17 +5,18 @@ import {
   fetchCategories, 
   createProduct, 
   updateProduct, 
-  deleteProduct,
-  createCategory,
-  updateCategory,
-  deleteCategory,
-  subscribeToStore
+  deleteProduct, 
+  createCategory, 
+  updateCategory, 
+  deleteCategory, 
+  subscribeToStore 
 } from '../services/storeService';
 import { AdminLayout } from './AdminLayout';
 import { AdminDashboard } from './AdminDashboard';
 import { ProductList } from './ProductList';
 import { ProductForm } from './ProductForm';
 import { CategoryManager } from './CategoryManager';
+import { FirebaseSettings } from './FirebaseSettings';
 
 export const AdminPortal = ({ onNavigateStore, onToast }) => {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -52,7 +53,7 @@ export const AdminPortal = ({ onNavigateStore, onToast }) => {
   const handleCreateProduct = async (productData) => {
     const created = await createProduct(productData);
     await loadData();
-    if (onToast) onToast(`✨ Product "${created.title}" published successfully!`);
+    if (onToast) onToast(`✨ Product "${created.title}" published & saved to Firebase!`);
     setActiveTab('products');
   };
 
@@ -60,7 +61,7 @@ export const AdminPortal = ({ onNavigateStore, onToast }) => {
     if (!editingProductId) return;
     const updated = await updateProduct(editingProductId, productData);
     await loadData();
-    if (onToast) onToast(`✓ Product "${updated.title}" updated successfully!`);
+    if (onToast) onToast(`✓ Product "${updated.title}" updated in Firebase!`);
     setEditingProductId(null);
     setActiveTab('products');
   };
@@ -68,7 +69,7 @@ export const AdminPortal = ({ onNavigateStore, onToast }) => {
   const handleDeleteProduct = async (productId) => {
     await deleteProduct(productId);
     await loadData();
-    if (onToast) onToast('Product deleted from inventory.');
+    if (onToast) onToast('Product removed from database.');
   };
 
   const handleStartEdit = (productId) => {
@@ -154,40 +155,10 @@ export const AdminPortal = ({ onNavigateStore, onToast }) => {
           onDeleteCategory={handleDeleteCategory}
         />
       ) : activeTab === 'settings' ? (
-        <div className="admin-card">
-          <div className="admin-card-header">
-            <h2 className="admin-card-title">Store & Cloudinary Settings</h2>
-          </div>
-          <div style={{ padding: '24px', lineHeight: '1.6' }}>
-            <h3 style={{ fontSize: '1.1rem', marginBottom: '8px', color: 'var(--admin-text-main)' }}>
-              DORCASS Haute Couture System Configuration
-            </h3>
-            <p style={{ color: 'var(--admin-text-muted)', marginBottom: '16px', fontSize: '0.9rem' }}>
-              Your store is configured to store only public Cloudinary image URLs. No sensitive API secrets or private tokens are stored on the frontend.
-            </p>
-
-            <div style={{ background: '#FCF8F9', border: '1px solid var(--admin-border)', borderRadius: '12px', padding: '16px', marginBottom: '20px' }}>
-              <h4 style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--admin-pink-deep)', marginBottom: '6px' }}>
-                📸 Cloudinary Media Format Guide
-              </h4>
-              <p style={{ fontSize: '0.85rem', color: 'var(--admin-text-main)' }}>
-                Paste direct delivery URLs generated from your Cloudinary Media Library, for example:<br />
-                <code style={{ background: '#FFF', padding: '2px 6px', borderRadius: '4px', border: '1px solid var(--admin-border)', fontSize: '0.8rem', display: 'inline-block', marginTop: '4px' }}>
-                  https://res.cloudinary.com/your-cloud-name/image/upload/v1234567/sample.jpg
-                </code>
-              </p>
-            </div>
-
-            <div style={{ display: 'flex', gap: '12px' }}>
-              <button 
-                className="admin-btn-secondary"
-                onClick={onNavigateStore}
-              >
-                Go to Storefront
-              </button>
-            </div>
-          </div>
-        </div>
+        <FirebaseSettings
+          onToast={onToast}
+          onNavigateStore={onNavigateStore}
+        />
       ) : null}
     </AdminLayout>
   );

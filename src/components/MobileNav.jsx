@@ -346,6 +346,18 @@ export const MobileNav = ({
                 <span>CONTACT</span>
               </button>
             </li>
+
+            {/* 5. ADMIN PORTAL */}
+            <li className="mobile-nav-item" style={{ marginTop: '8px' }}>
+              <button
+                className={`mobile-nav-link ${activePath === '/admin' ? 'is-active' : ''}`}
+                onClick={() => handleNavClick('/admin', null, null, null, null)}
+                style={{ color: 'var(--brand-pink-primary)', fontWeight: 700 }}
+              >
+                <span>⚙️ ADMIN PORTAL</span>
+                <span className="mobile-nav-pill" style={{ background: 'var(--brand-pink-primary)', color: '#FFF' }}>Portal</span>
+              </button>
+            </li>
           </ul>
         </div>
 

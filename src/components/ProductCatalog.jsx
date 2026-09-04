@@ -134,7 +134,7 @@ export const ProductCatalog = ({
             const isWishlisted = wishlist.has(product.id);
             return (
               <div className="product-card" key={product.id}>
-                <div className="product-thumb-box">
+                <div className="product-thumb-box" onClick={() => onQuickView(product.id)} style={{ cursor: 'pointer' }}>
                   {product.badge && <span className="product-badge">{product.badge}</span>}
                   
                   <button 
@@ -153,7 +153,7 @@ export const ProductCatalog = ({
                   <img className="product-thumb-img" src={product.image} alt={product.title} />
                   
                   <div className="product-quick-view-overlay">
-                    <button className="quick-view-btn" onClick={() => onQuickView(product.id)}>
+                    <button className="quick-view-btn" onClick={(e) => { e.stopPropagation(); onQuickView(product.id); }}>
                       Quick View
                     </button>
                   </div>
@@ -161,10 +161,10 @@ export const ProductCatalog = ({
 
                 <div className="product-info-box">
                   <div className="product-rating">
-                    <span>★ {product.rating}</span>
-                    <span className="count">({product.reviewsCount})</span>
+                    <span>★ {product.rating || 5.0}</span>
+                    <span className="count">({product.reviewsCount || 0})</span>
                   </div>
-                  <h3 className="product-title">{product.title}</h3>
+                  <h3 className="product-title" onClick={() => onQuickView(product.id)} style={{ cursor: 'pointer' }}>{product.title}</h3>
                   <p className="product-sub">{product.subtitle}</p>
                   
                     <div className="product-price-row">

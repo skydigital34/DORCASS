@@ -4,9 +4,12 @@ import { generateSingleProductWhatsAppUrl } from '../utils/whatsapp';
 export const QuickViewModal = ({ product, isOpen, onClose, onAddToCart }) => {
   const [selectedSize, setSelectedSize] = useState('Free Size');
   const [selectedColor, setSelectedColor] = useState('Default');
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
   useEffect(() => {
     if (product) {
+      setSelectedImageIndex(0);
+
       if (product.sizes && product.sizes.length > 0) {
         setSelectedSize(product.sizes[0]);
       } else {
@@ -23,6 +26,12 @@ export const QuickViewModal = ({ product, isOpen, onClose, onAddToCart }) => {
 
   if (!isOpen || !product) return null;
 
+  const imagesList = Array.isArray(product.images) && product.images.length > 0 
+    ? product.images.filter(img => img && typeof img === 'string' && img.trim().length > 0)
+    : (product.image ? [product.image] : []);
+
+  const activeImage = imagesList[selectedImageIndex] || product.image || '/assets/images/featured-saree.jpg';
+
   return (
     <div className="modal-backdrop active" onClick={(e) => {
       if (e.target === e.currentTarget) onClose();
@@ -31,32 +40,73 @@ export const QuickViewModal = ({ product, isOpen, onClose, onAddToCart }) => {
         <button className="modal-close-btn" onClick={onClose} aria-label="Close modal">✕</button>
         
         <div className="quick-view-content">
-          <div className="quick-view-gallery">
-            <img src={product.image} alt={product.title} />
+          {/* Gallery View */}
+          <div className="quick-view-gallery-wrapper" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            {/* Main High-Res Image */}
+            <div className="quick-view-gallery" style={{ width: '100%', minHeight: '380px', maxHeight: '480px', borderRadius: '16px', overflow: 'hidden', background: '#FCF8F9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <img 
+                src={activeImage} 
+                alt={product.title} 
+                style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'all 0.25s ease' }}
+              />
+            </div>
+
+            {/* Multiple Images Thumbnail Strip */}
+            {imagesList.length > 1 && (
+              <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '4px' }}>
+                {imagesList.map((imgUrl, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => setSelectedImageIndex(idx)}
+                    style={{
+                      width: '64px',
+                      height: '76px',
+                      borderRadius: '8px',
+                      overflow: 'hidden',
+                      border: selectedImageIndex === idx ? '2px solid var(--brand-pink-primary)' : '1px solid var(--brand-pink-border)',
+                      padding: 0,
+                      background: '#FFF',
+                      cursor: 'pointer',
+                      flexShrink: 0,
+                      opacity: selectedImageIndex === idx ? 1 : 0.65,
+                      transition: 'all 0.2s ease'
+                    }}
+                  >
+                    <img 
+                      src={imgUrl} 
+                      alt={`Thumbnail ${idx + 1}`} 
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    />
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
+          {/* Product Details */}
           <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
             <div>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px', flexWrap: 'wrap', gap: '8px' }}>
                 <span className="section-tag" style={{ margin: 0 }}>{product.badge || 'DORCASS Signature'}</span>
                 <div style={{ color: '#D4AF37', fontWeight: 700, fontSize: '0.9rem' }}>
-                  ★ {product.rating} ({product.reviewsCount} reviews)
+                  ★ {product.rating || '5.0'} ({product.reviewsCount || 0} reviews)
                 </div>
               </div>
 
-              <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.8rem', fontWeight: 800, color: 'var(--text-main)', marginBottom: '4px' }}>
+              <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.75rem', fontWeight: 800, color: 'var(--text-main)', marginBottom: '4px', lineHeight: '1.25' }}>
                 {product.title}
               </h2>
-              <div style={{ fontSize: '0.95rem', color: 'var(--text-muted)', marginBottom: '16px' }}>
-                {product.subtitle}
+              <div style={{ fontSize: '0.92rem', color: 'var(--text-muted)', marginBottom: '16px' }}>
+                {product.subtitle || `${product.category || 'Luxury'} Collection`}
               </div>
 
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: '12px', marginBottom: '20px' }}>
-                <span style={{ fontFamily: 'var(--font-display)', fontSize: '1.8rem', fontWeight: 800, color: 'var(--brand-pink-deep)' }}>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: '12px', marginBottom: '16px' }}>
+                <span style={{ fontFamily: 'var(--font-display)', fontSize: '1.75rem', fontWeight: 800, color: 'var(--brand-pink-deep)' }}>
                   ₹{Number(product.price || 0).toFixed(2)}
                 </span>
                 {product.originalPrice ? (
-                  <span style={{ fontSize: '1.1rem', color: 'var(--text-light)', textDecoration: 'line-through' }}>
+                  <span style={{ fontSize: '1.05rem', color: 'var(--text-light)', textDecoration: 'line-through' }}>
                     ₹{Number(product.originalPrice).toFixed(2)}
                   </span>
                 ) : null}
@@ -67,13 +117,25 @@ export const QuickViewModal = ({ product, isOpen, onClose, onAddToCart }) => {
                 ) : null}
               </div>
               
-              <p style={{ fontSize: '0.95rem', color: 'var(--text-body)', lineHeight: '1.6', marginBottom: '24px' }}>
-                {product.description}
-              </p>
+              {/* Product Description */}
+              <div style={{ marginBottom: '20px' }}>
+                <h3 style={{ fontSize: '0.85rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-main)', marginBottom: '6px' }}>
+                  Description & Details
+                </h3>
+                <p style={{ fontSize: '0.92rem', color: 'var(--text-body)', lineHeight: '1.6', whiteSpace: 'pre-line' }}>
+                  {product.description || 'Crafted with premium materials and signature design for effortless luxury.'}
+                </p>
+                {product.fabric && (
+                  <div style={{ fontSize: '0.84rem', color: 'var(--text-muted)', marginTop: '8px' }}>
+                    <strong>Fabric / Material:</strong> {product.fabric}
+                  </div>
+                )}
+              </div>
 
+              {/* Color Selection */}
               {product.colors && product.colors.length > 0 && (
-                <div style={{ marginBottom: '20px' }}>
-                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, textTransform: 'uppercase', marginBottom: '8px', color: 'var(--text-main)' }}>
+                <div style={{ marginBottom: '18px' }}>
+                  <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, textTransform: 'uppercase', marginBottom: '8px', color: 'var(--text-main)' }}>
                     Color: <span style={{ color: 'var(--brand-pink-primary)', fontWeight: 600 }}>{selectedColor}</span>
                   </label>
                   <div style={{ display: 'flex', gap: '10px' }}>
@@ -91,32 +153,35 @@ export const QuickViewModal = ({ product, isOpen, onClose, onAddToCart }) => {
                           boxShadow: '0 2px 6px rgba(0,0,0,0.15)',
                           cursor: 'pointer'
                         }}
+                        title={c.name}
                       />
                     ))}
                   </div>
                 </div>
               )}
 
+              {/* Sizes Selection */}
               {product.sizes && product.sizes.length > 0 && (
-                <div style={{ marginBottom: '24px' }}>
-                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, textTransform: 'uppercase', marginBottom: '8px', color: 'var(--text-main)' }}>
-                    Select Size
+                <div style={{ marginBottom: '20px' }}>
+                  <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, textTransform: 'uppercase', marginBottom: '8px', color: 'var(--text-main)' }}>
+                    Select Size: <span style={{ color: 'var(--brand-pink-primary)' }}>{selectedSize}</span>
                   </label>
-                  <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                  <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                     {product.sizes.map(s => (
                       <button 
                         key={s}
                         className="size-select-btn" 
                         onClick={() => setSelectedSize(s)}
                         style={{
-                          padding: '8px 18px',
-                          borderRadius: '12px',
-                          border: selectedSize === s ? '1.5px solid var(--brand-pink-primary)' : '1.5px solid var(--brand-pink-border)',
+                          padding: '7px 16px',
+                          borderRadius: '10px',
+                          border: selectedSize === s ? '2px solid var(--brand-pink-primary)' : '1px solid var(--brand-pink-border)',
                           background: selectedSize === s ? 'var(--brand-pink-subtle)' : '#FFFFFF',
                           color: selectedSize === s ? 'var(--brand-pink-primary)' : 'var(--text-main)',
                           fontWeight: 700,
-                          fontSize: '0.9rem',
-                          cursor: 'pointer'
+                          fontSize: '0.88rem',
+                          cursor: 'pointer',
+                          transition: 'all 0.15s ease'
                         }}
                       >
                         {s}
@@ -127,6 +192,7 @@ export const QuickViewModal = ({ product, isOpen, onClose, onAddToCart }) => {
               )}
             </div>
 
+            {/* Actions (Add to Bag & WhatsApp) */}
             <div>
               <div style={{ display: 'flex', gap: '12px', marginTop: '12px', flexWrap: 'wrap' }}>
                 <button 
@@ -145,7 +211,8 @@ export const QuickViewModal = ({ product, isOpen, onClose, onAddToCart }) => {
                     justifyContent: 'center',
                     gap: '8px',
                     cursor: 'pointer',
-                    transition: 'all 0.2s ease'
+                    transition: 'all 0.2s ease',
+                    border: 'none'
                   }}
                 >
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
