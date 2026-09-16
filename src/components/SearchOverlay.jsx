@@ -49,7 +49,7 @@ export const SearchOverlay = ({ isOpen, onClose, products, onQuickView }) => {
         </button>
       </div>
 
-      <div style={{
+      <div className="search-results-box" style={{
         width: '90%',
         maxWidth: '680px',
         marginTop: '24px',
@@ -58,23 +58,24 @@ export const SearchOverlay = ({ isOpen, onClose, products, onQuickView }) => {
         padding: '24px',
         boxShadow: '0 15px 40px rgba(0,0,0,0.15)'
       }}>
-        <div style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '12px' }}>
+        <div className="search-results-header" style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '12px' }}>
           {query.trim() ? `Search Results (${results.length})` : 'Popular Searches: "Saree", "Streetwear", "Kurti"'}
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+        <div className="search-results-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
           {query.trim() === '' ? (
-            <p style={{ color: 'var(--text-muted)', textAlign: 'center', gridColumn: '1/-1', padding: '20px' }}>
+            <p className="search-empty-text" style={{ color: 'var(--text-muted)', textAlign: 'center', gridColumn: '1/-1', padding: '20px' }}>
               Type keywords like "Saree", "Dress", "Graphic Tee"...
             </p>
           ) : results.length === 0 ? (
-            <p style={{ color: 'var(--text-muted)', textAlign: 'center', gridColumn: '1/-1', padding: '20px' }}>
+            <p className="search-empty-text" style={{ color: 'var(--text-muted)', textAlign: 'center', gridColumn: '1/-1', padding: '20px' }}>
               No matching pieces found.
             </p>
           ) : (
             results.map(p => (
               <div 
                 key={p.id}
+                className="search-result-item"
                 style={{
                   display: 'flex',
                   gap: '14px',
@@ -89,10 +90,10 @@ export const SearchOverlay = ({ isOpen, onClose, products, onQuickView }) => {
                   onClose();
                 }}
               >
-                <img src={p.image} alt={p.title} style={{ width: '50px', height: '50px', borderRadius: '10px', objectFit: 'cover' }} />
-                <div>
-                  <div style={{ fontWeight: 700, fontSize: '0.95rem', color: 'var(--text-main)' }}>{p.title}</div>
-                  <div style={{ fontWeight: 700, color: 'var(--brand-pink-deep)', fontSize: '0.9rem' }}>₹{Number(p.price || 0).toFixed(2)}</div>
+                <img className="search-result-img" src={p.image} alt={p.title} style={{ width: '50px', height: '50px', borderRadius: '10px', objectFit: 'cover', flexShrink: 0 }} />
+                <div className="search-result-info" style={{ minWidth: 0, flex: 1 }}>
+                  <div className="search-result-title" style={{ fontWeight: 700, fontSize: '0.95rem', color: 'var(--text-main)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{p.title}</div>
+                  <div className="search-result-price" style={{ fontWeight: 700, color: 'var(--brand-pink-deep)', fontSize: '0.9rem' }}>₹{Number(p.price || 0).toFixed(2)}</div>
                 </div>
               </div>
             ))

@@ -85,7 +85,7 @@ export const QuickViewModal = ({ product, isOpen, onClose, onAddToCart }) => {
           </div>
 
           {/* Product Details */}
-          <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+          <div className="quick-view-details-col" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
             <div>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px', flexWrap: 'wrap', gap: '8px' }}>
                 <span className="section-tag" style={{ margin: 0 }}>{product.badge || 'DORCASS Signature'}</span>
@@ -94,24 +94,24 @@ export const QuickViewModal = ({ product, isOpen, onClose, onAddToCart }) => {
                 </div>
               </div>
 
-              <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.75rem', fontWeight: 800, color: 'var(--text-main)', marginBottom: '4px', lineHeight: '1.25' }}>
+              <h2 className="quick-view-title" style={{ fontFamily: 'var(--font-display)', fontSize: '1.75rem', fontWeight: 800, color: 'var(--text-main)', marginBottom: '4px', lineHeight: '1.25' }}>
                 {product.title}
               </h2>
-              <div style={{ fontSize: '0.92rem', color: 'var(--text-muted)', marginBottom: '16px' }}>
+              <div className="quick-view-subtitle" style={{ fontSize: '0.92rem', color: 'var(--text-muted)', marginBottom: '16px' }}>
                 {product.subtitle || `${product.category || 'Luxury'} Collection`}
               </div>
 
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: '12px', marginBottom: '16px' }}>
-                <span style={{ fontFamily: 'var(--font-display)', fontSize: '1.75rem', fontWeight: 800, color: 'var(--brand-pink-deep)' }}>
+              <div className="quick-view-price-row" style={{ display: 'flex', alignItems: 'baseline', gap: '12px', marginBottom: '16px', flexWrap: 'wrap' }}>
+                <span className="quick-view-current-price" style={{ fontFamily: 'var(--font-display)', fontSize: '1.75rem', fontWeight: 800, color: 'var(--brand-pink-deep)' }}>
                   ₹{Number(product.price || 0).toFixed(2)}
                 </span>
                 {product.originalPrice ? (
-                  <span style={{ fontSize: '1.05rem', color: 'var(--text-light)', textDecoration: 'line-through' }}>
+                  <span className="quick-view-orig-price" style={{ fontSize: '1.05rem', color: 'var(--text-light)', textDecoration: 'line-through' }}>
                     ₹{Number(product.originalPrice).toFixed(2)}
                   </span>
                 ) : null}
                 {product.discount ? (
-                  <span style={{ background: '#FFE8EF', color: 'var(--brand-pink-primary)', padding: '3px 10px', borderRadius: '12px', fontWeight: 700, fontSize: '0.82rem' }}>
+                  <span className="discount-tag" style={{ background: '#FFE8EF', color: 'var(--brand-pink-primary)', padding: '3px 10px', borderRadius: '12px', fontWeight: 700, fontSize: '0.82rem' }}>
                     {product.discount}
                   </span>
                 ) : null}
@@ -122,7 +122,7 @@ export const QuickViewModal = ({ product, isOpen, onClose, onAddToCart }) => {
                 <h3 style={{ fontSize: '0.85rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-main)', marginBottom: '6px' }}>
                   Description & Details
                 </h3>
-                <p style={{ fontSize: '0.92rem', color: 'var(--text-body)', lineHeight: '1.6', whiteSpace: 'pre-line' }}>
+                <p className="quick-view-desc" style={{ fontSize: '0.92rem', color: 'var(--text-body)', lineHeight: '1.6', whiteSpace: 'pre-line' }}>
                   {product.description || 'Crafted with premium materials and signature design for effortless luxury.'}
                 </p>
                 {product.fabric && (
@@ -134,11 +134,11 @@ export const QuickViewModal = ({ product, isOpen, onClose, onAddToCart }) => {
 
               {/* Color Selection */}
               {product.colors && product.colors.length > 0 && (
-                <div style={{ marginBottom: '18px' }}>
+                <div className="quick-view-color-section" style={{ marginBottom: '18px' }}>
                   <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, textTransform: 'uppercase', marginBottom: '8px', color: 'var(--text-main)' }}>
                     Color: <span style={{ color: 'var(--brand-pink-primary)', fontWeight: 600 }}>{selectedColor}</span>
                   </label>
-                  <div style={{ display: 'flex', gap: '10px' }}>
+                  <div className="quick-view-swatches-row" style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
                     {product.colors.map(c => (
                       <button 
                         key={c.name}
@@ -162,11 +162,11 @@ export const QuickViewModal = ({ product, isOpen, onClose, onAddToCart }) => {
 
               {/* Sizes Selection */}
               {product.sizes && product.sizes.length > 0 && (
-                <div style={{ marginBottom: '20px' }}>
+                <div className="quick-view-size-section" style={{ marginBottom: '20px' }}>
                   <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, textTransform: 'uppercase', marginBottom: '8px', color: 'var(--text-main)' }}>
                     Select Size: <span style={{ color: 'var(--brand-pink-primary)' }}>{selectedSize}</span>
                   </label>
-                  <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                  <div className="quick-view-sizes-row" style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                     {product.sizes.map(s => (
                       <button 
                         key={s}
@@ -194,8 +194,9 @@ export const QuickViewModal = ({ product, isOpen, onClose, onAddToCart }) => {
 
             {/* Actions (Add to Bag & WhatsApp) */}
             <div>
-              <div style={{ display: 'flex', gap: '12px', marginTop: '12px', flexWrap: 'wrap' }}>
+              <div className="quick-view-actions-row" style={{ display: 'flex', gap: '12px', marginTop: '12px', flexWrap: 'wrap' }}>
                 <button 
+                  className="quick-view-add-btn"
                   onClick={() => onAddToCart(product, 1, selectedSize, selectedColor)}
                   style={{
                     flex: '1 1 180px',
@@ -224,6 +225,7 @@ export const QuickViewModal = ({ product, isOpen, onClose, onAddToCart }) => {
                 </button>
 
                 <a 
+                  className="quick-view-whatsapp-btn"
                   href={generateSingleProductWhatsAppUrl(product, selectedSize, selectedColor, 1)}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -250,7 +252,7 @@ export const QuickViewModal = ({ product, isOpen, onClose, onAddToCart }) => {
                   Order on WhatsApp
                 </a>
               </div>
-              <div style={{ marginTop: '16px', fontSize: '0.82rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '16px' }}>
+              <div className="quick-view-features" style={{ marginTop: '16px', fontSize: '0.82rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
                 <span>✓ Free Express Shipping</span>
                 <span>✓ 7-Day Easy Return</span>
                 <span>✓ 100% Genuine</span>
