@@ -5,7 +5,7 @@ export const BrandStory = () => {
     <section className="store-section" id="story">
       <div className="story-banner">
         <div className="story-content">
-          <span className="section-tag">Our Philosophy</span>
+          <span className="section-tag">About Us</span>
           <h2 className="section-title">Crafted with Conscious Elegance</h2>
           <p style={{ fontSize: '1.05rem', color: 'var(--text-body)', lineHeight: '1.7', marginBottom: '20px' }}>
             At <strong>DORCASS</strong>, we believe true fashion is a celebration of individuality. From our ethically sourced mulberry silk sarees woven by generational artisans to our 240 GSM organic cotton streetwear tees, every garment is thoughtfully crafted to empower your personal expression.
