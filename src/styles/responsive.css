@@ -59,6 +59,10 @@
     gap: 10px;
   }
 
+  .header-login-btn {
+    display: none !important;
+  }
+
   .brand-name {
     font-size: 1.35rem;
   }
@@ -499,8 +503,9 @@
     height: 17px;
   }
 
-  .user-profile-btn {
-    display: none;
+  .user-profile-btn,
+  .header-login-btn {
+    display: none !important;
   }
 
   .cart-pill-btn {

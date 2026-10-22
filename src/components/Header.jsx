@@ -219,26 +219,12 @@ export const Header = ({
                 </svg>
               </button>
 
-              {/* Login Button */}
+              {/* Login Button (Desktop only; hidden on mobile in favor of hamburger drawer) */}
               <button 
                 className="header-login-btn" 
                 onClick={onOpenLogin} 
                 aria-label="Login" 
                 title="Login"
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  padding: '7px 14px',
-                  borderRadius: '20px',
-                  border: '1.5px solid var(--brand-pink-border, #FAD2DF)',
-                  background: '#FFFFFF',
-                  color: 'var(--text-main, #2D2327)',
-                  fontSize: '0.82rem',
-                  fontWeight: 700,
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease'
-                }}
               >
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
