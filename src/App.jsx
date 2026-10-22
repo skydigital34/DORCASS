@@ -10,7 +10,6 @@ import { ProductCatalog } from './components/ProductCatalog';
 import { CategoryPage } from './components/CategoryPage';
 import { CuratedCollections } from './components/CuratedCollections';
 import { BrandStory } from './components/BrandStory';
-import { Newsletter } from './components/Newsletter';
 import { Footer } from './components/Footer';
 import { CartDrawer } from './components/CartDrawer';
 import { QuickViewModal } from './components/QuickViewModal';
@@ -324,8 +323,6 @@ export function App() {
           <CuratedCollections onNavigate={handleNavigate} />
 
           <BrandStory />
-
-          <Newsletter onSubscribe={(email) => addToast('💌 Welcome to VIP Club! Use code DORCASS20 for 20% OFF')} />
         </>
       )}
 
