@@ -1081,13 +1081,12 @@
   }
 
   .category-tabs {
-    display: flex;
-    overflow-x: auto;
-    scrollbar-width: none;
-    -webkit-overflow-scrolling: touch;
-    padding: 4px 2px;
-    gap: 6px;
-    flex-wrap: nowrap;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    overflow: visible !important;
+    padding: 4px 0 !important;
+    gap: 8px !important;
+    width: 100% !important;
   }
 
   .category-tabs::-webkit-scrollbar {
@@ -1095,12 +1094,13 @@
   }
 
   .filter-tab-btn {
-    white-space: nowrap;
-    padding: 7px 14px;
-    min-height: 38px;
-    font-size: 0.8rem;
-    border-radius: 20px;
-    flex-shrink: 0;
+    white-space: nowrap !important;
+    padding: 7px 14px !important;
+    min-height: 36px !important;
+    font-size: 0.82rem !important;
+    border-radius: 24px !important;
+    flex: 0 0 auto !important;
+    text-align: center !important;
   }
 
   .sort-wrapper {
