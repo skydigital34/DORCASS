@@ -1030,16 +1030,9 @@
     margin-top: 3px;
   }
 
-  .featured-look-floating-card {
-    width: 100%;
-    max-width: 280px;
-    margin: 2px auto 0;
-    padding: 10px 12px;
-    border-radius: 18px;
-  }
-
-  .featured-look-img-wrapper {
-    height: 135px;
+  .featured-look-floating-card,
+  #heroFeaturedCard {
+    display: none !important;
   }
 
   /* Stats Banner */
@@ -2117,9 +2110,6 @@
     font-size: 0.56rem;
   }
 
-  .featured-look-floating-card {
-    max-width: 250px;
-  }
 
   .hero-stats-banner {
     grid-template-columns: 1fr;
