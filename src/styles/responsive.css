@@ -1832,15 +1832,38 @@
   /* ==========================================================================
      MOBILE HOME SECTIONS (Collections, Reviews, Story, Newsletter)
      ========================================================================== */
-  .collections-grid,
-  .reviews-grid {
-    grid-template-columns: 1fr;
-    gap: 14px;
+  /* ==========================================================================
+     Curated Collections - Mobile Horizontal Swipe Carousel
+     ========================================================================== */
+  .collections-grid {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    scroll-snap-type: x mandatory !important;
+    scroll-behavior: smooth !important;
+    -webkit-overflow-scrolling: touch !important;
+    gap: 14px !important;
+    padding: 6px 16px 18px !important;
+    margin-left: -12px !important;
+    margin-right: -12px !important;
+    scrollbar-width: none !important;
+  }
+
+  .collections-grid::-webkit-scrollbar {
+    display: none !important;
   }
 
   .collection-card {
-    height: 220px;
-    border-radius: 18px;
+    flex: 0 0 80% !important;
+    min-width: 240px !important;
+    max-width: 300px !important;
+    height: 300px !important;
+    border-radius: 20px !important;
+    scroll-snap-align: start !important;
+    scroll-snap-stop: always !important;
+    box-shadow: 0 8px 24px rgba(45, 35, 39, 0.12) !important;
   }
 
   .collection-overlay {
