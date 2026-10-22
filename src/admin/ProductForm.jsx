@@ -17,7 +17,7 @@ export const ProductForm = ({
   const [formData, setFormData] = useState({
     title: '',
     subtitle: '',
-    category: '',
+    category: 'sarees',
     subcategory: '',
     tertiaryCategory: '',
     price: '',
@@ -249,6 +249,19 @@ export const ProductForm = ({
     }
   };
 
+  const handleUseSampleImage = () => {
+    setFormData(prev => ({
+      ...prev,
+      images: ['/assets/images/featured-saree.jpg']
+    }));
+    setErrors(prev => {
+      const next = { ...prev };
+      delete next.images;
+      delete next.submit;
+      return next;
+    });
+  };
+
   // Validation
   const validateForm = () => {
     const newErrors = {};
@@ -275,29 +288,39 @@ export const ProductForm = ({
 
     const validImages = formData.images.filter(img => img && img.trim().length > 0);
     if (validImages.length === 0) {
-      newErrors.images = 'Please upload at least one image or provide an image URL.';
+      newErrors.images = 'Please upload an image, enter an image URL, or click "Use Sample Image".';
+    }
+
+    const errorKeys = Object.keys(newErrors);
+    if (errorKeys.length > 0) {
+      newErrors.submit = `Cannot publish product. Please fix: ${errorKeys.map(k => newErrors[k]).join(' • ')}`;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    return errorKeys.length === 0;
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
     if (!validateForm()) return;
 
     try {
       setIsSubmitting(true);
+      const validImages = formData.images.filter(img => img && img.trim().length > 0);
       await onSave({
         ...formData,
+        category: formData.category || 'sarees',
         price: Number(formData.price),
         originalPrice: formData.originalPrice ? Number(formData.originalPrice) : null,
-        stock: parseInt(formData.stock, 10),
-        images: formData.images.filter(img => img && img.trim().length > 0),
+        stock: parseInt(formData.stock !== undefined && formData.stock !== '' ? formData.stock : 10, 10),
+        images: validImages.length > 0 ? validImages : ['/assets/images/featured-saree.jpg'],
         sizes: formData.sizes && formData.sizes.length > 0 ? formData.sizes : ['Free Size']
       });
     } catch (err) {
+      console.error('Save product error:', err);
       setErrors(prev => ({ ...prev, submit: err.message || 'Failed to save product.' }));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     } finally {
       setIsSubmitting(false);
     }
@@ -718,14 +741,23 @@ export const ProductForm = ({
                 })}
               </div>
 
-              <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
+              <div style={{ display: 'flex', gap: '10px', marginTop: '10px', flexWrap: 'wrap' }}>
                 <button 
                   type="button" 
                   className="admin-add-img-btn"
                   onClick={() => fileInputRef.current?.click()}
-                  style={{ flex: 1 }}
+                  style={{ flex: 1, minWidth: '150px' }}
                 >
                   📁 Browse Device File
+                </button>
+                <button 
+                  type="button" 
+                  className="admin-btn-secondary"
+                  onClick={handleUseSampleImage}
+                  style={{ borderRadius: 'var(--admin-radius-sm)', fontSize: '0.84rem', borderColor: 'var(--admin-pink)', color: 'var(--admin-pink)' }}
+                  title="Auto-fill with sample product image for quick testing"
+                >
+                  ✨ Use Sample Image
                 </button>
                 <button 
                   type="button" 

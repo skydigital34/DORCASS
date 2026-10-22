@@ -230,8 +230,9 @@ export const syncProductToFirestore = async (product) => {
   const { db } = initFirebase();
   if (!db) return;
 
-  const docRef = doc(db, 'products', product.id);
-  await setDoc(docRef, product, { merge: true });
+  const sanitized = JSON.parse(JSON.stringify(product));
+  const docRef = doc(db, 'products', sanitized.id);
+  await setDoc(docRef, sanitized, { merge: true });
 };
 
 export const deleteProductFromFirestore = async (productId) => {

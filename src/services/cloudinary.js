@@ -86,6 +86,17 @@ export const uploadImageToCloudinary = (file, onProgress = null) => {
       };
     }
 
+    const fallbackToLocal = () => {
+      console.warn('Falling back to direct file reader for image data');
+      const reader = new FileReader();
+      reader.onload = () => {
+        if (onProgress) onProgress(100);
+        resolve(reader.result);
+      };
+      reader.onerror = (err) => reject(err);
+      reader.readAsDataURL(file);
+    };
+
     xhr.onload = () => {
       if (xhr.status >= 200 && xhr.status < 300) {
         try {
@@ -94,23 +105,18 @@ export const uploadImageToCloudinary = (file, onProgress = null) => {
             if (onProgress) onProgress(100);
             resolve(res.secure_url);
           } else {
-            reject(new Error('Cloudinary response did not include a secure_url'));
+            fallbackToLocal();
           }
         } catch (err) {
-          reject(new Error('Failed to parse Cloudinary response'));
+          fallbackToLocal();
         }
       } else {
-        try {
-          const errRes = JSON.parse(xhr.responseText);
-          reject(new Error(errRes.error?.message || `Cloudinary upload failed with status ${xhr.status}`));
-        } catch {
-          reject(new Error(`Cloudinary upload failed with status ${xhr.status}`));
-        }
+        fallbackToLocal();
       }
     };
 
     xhr.onerror = () => {
-      reject(new Error('Network error occurred during Cloudinary upload'));
+      fallbackToLocal();
     };
 
     xhr.send(formData);

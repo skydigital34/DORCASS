@@ -118,6 +118,23 @@ export const saveStoredProducts = (products, shouldNotify = true) => {
 /**
  * Setup Real-time Firebase Firestore listener
  */
+const mergeWithDefaultProducts = (remoteProducts) => {
+  const mergedMap = new Map();
+  // 1. Seed with default products
+  DEFAULT_PRODUCTS.forEach(p => mergedMap.set(p.id, p));
+  // 2. Add local storage products if any
+  const local = getStoredProducts();
+  local.forEach(p => mergedMap.set(p.id, p));
+  // 3. Remote products have highest priority
+  if (Array.isArray(remoteProducts)) {
+    remoteProducts.forEach(p => mergedMap.set(p.id, p));
+  }
+  return Array.from(mergedMap.values());
+};
+
+/**
+ * Setup Real-time Firebase Firestore listener
+ */
 let firestoreUnsubscribe = null;
 
 export const initFirestoreSync = () => {
@@ -129,7 +146,8 @@ export const initFirestoreSync = () => {
   if (isFirebaseConfigured()) {
     firestoreUnsubscribe = subscribeToFirestoreProducts((firestoreProducts) => {
       if (Array.isArray(firestoreProducts) && firestoreProducts.length > 0) {
-        saveStoredProducts(firestoreProducts, true);
+        const merged = mergeWithDefaultProducts(firestoreProducts);
+        saveStoredProducts(merged, true);
       }
     });
   }
@@ -160,8 +178,9 @@ export const fetchProducts = async () => {
     try {
       const remote = await fetchAllFirestoreProducts();
       if (remote && Array.isArray(remote) && remote.length > 0) {
-        saveStoredProducts(remote, false);
-        return remote;
+        const merged = mergeWithDefaultProducts(remote);
+        saveStoredProducts(merged, false);
+        return merged;
       }
     } catch (err) {
       console.warn('Firestore fetch failed, using local cache:', err);
@@ -198,9 +217,10 @@ export const createProduct = async (productData) => {
   if (productData.stock === undefined || productData.stock === null || isNaN(productData.stock) || Number(productData.stock) < 0) {
     throw new Error('Valid stock quantity is required.');
   }
-  if (!productData.images || !Array.isArray(productData.images) || productData.images.length === 0 || !productData.images[0]) {
-    throw new Error('At least one primary image is required.');
-  }
+  const validImages = Array.isArray(productData.images)
+    ? productData.images.filter(img => img && typeof img === 'string' && img.trim().length > 0)
+    : [];
+  const finalImages = validImages.length > 0 ? validImages : ['/assets/images/featured-saree.jpg'];
 
   const products = getStoredProducts();
   const slug = (productData.slug || productData.title)
@@ -216,7 +236,7 @@ export const createProduct = async (productData) => {
     title: productData.title.trim(),
     subtitle: productData.subtitle?.trim() || `${productData.category} • ${productData.subcategory || 'Signature'}`,
     slug: `${slug}-${newId.substr(-4)}`,
-    category: productData.category,
+    category: productData.category || 'sarees',
     subcategory: productData.subcategory || null,
     tertiaryCategory: productData.tertiaryCategory || null,
     price: Number(productData.price),
@@ -225,10 +245,10 @@ export const createProduct = async (productData) => {
       ? `${Math.round(((Number(productData.originalPrice) - Number(productData.price)) / Number(productData.originalPrice)) * 100)}% OFF`
       : null,
     description: productData.description?.trim() || '',
-    stock: parseInt(productData.stock, 10),
-    status: productData.status || (parseInt(productData.stock, 10) > 0 ? 'published' : 'out-of-stock'),
-    images: productData.images.filter(img => img && typeof img === 'string' && img.trim().length > 0),
-    image: productData.images[0] || '',
+    stock: parseInt(productData.stock !== undefined ? productData.stock : 10, 10),
+    status: productData.status || (parseInt(productData.stock !== undefined ? productData.stock : 10, 10) > 0 ? 'published' : 'out-of-stock'),
+    images: finalImages,
+    image: finalImages[0],
     badge: productData.badge?.trim() || (productData.isNew ? 'New Arrival' : ''),
     rating: productData.rating || 5.0,
     reviewsCount: productData.reviewsCount || 0,

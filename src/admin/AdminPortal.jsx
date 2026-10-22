@@ -51,19 +51,31 @@ export const AdminPortal = ({ onNavigateStore, onToast }) => {
 
   // Product CRUD Handlers
   const handleCreateProduct = async (productData) => {
-    const created = await createProduct(productData);
-    await loadData();
-    if (onToast) onToast(`✨ Product "${created.title}" published & saved to Firebase!`);
-    setActiveTab('products');
+    try {
+      const created = await createProduct(productData);
+      await loadData();
+      if (onToast) onToast(`✨ Product "${created.title}" published & saved!`);
+      setActiveTab('products');
+    } catch (err) {
+      console.error('Failed to create product:', err);
+      if (onToast) onToast(`❌ Failed to publish: ${err.message}`);
+      throw err;
+    }
   };
 
   const handleUpdateProduct = async (productData) => {
     if (!editingProductId) return;
-    const updated = await updateProduct(editingProductId, productData);
-    await loadData();
-    if (onToast) onToast(`✓ Product "${updated.title}" updated in Firebase!`);
-    setEditingProductId(null);
-    setActiveTab('products');
+    try {
+      const updated = await updateProduct(editingProductId, productData);
+      await loadData();
+      if (onToast) onToast(`✓ Product "${updated.title}" updated!`);
+      setEditingProductId(null);
+      setActiveTab('products');
+    } catch (err) {
+      console.error('Failed to update product:', err);
+      if (onToast) onToast(`❌ Failed to update: ${err.message}`);
+      throw err;
+    }
   };
 
   const handleDeleteProduct = async (productId) => {
