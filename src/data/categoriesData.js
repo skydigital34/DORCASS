@@ -35,20 +35,20 @@ export const CATEGORIES_DATA = [
     path: '/category/sarees',
     tagline: 'Timeless drapes, thoughtfully curated.',
     description: 'Pure mul-silk, handcrafted weaves, and regal heritage festive drapes for celebrations that last a lifetime.',
-    image: '/assets/images/featured-saree.jpg',
+    image: '/assets/products/Salwars/Tissue_silk.jpeg',
     seoTitle: 'Luxury Sarees Collection | DORCASS',
-    seoDescription: 'Explore handcrafted Indian silk sarees, Mal Mal cotton-silks, organic linen, and festive tissue silk at DORCASS.',
+    seoDescription: 'Explore handcrafted Indian silk sarees, Mul Mul sarees, organic linen, modal bandhej, chennur silks, and festive tissue silk at DORCASS.',
     children: [
       {
-        id: 'mal-mal-sarees',
-        name: 'Mal Mal sarees',
-        slug: 'mal-mal-sarees',
-        path: '/category/sarees/mal-mal-sarees',
+        id: 'mul-mul-sarees',
+        name: 'Mul Mul sarees',
+        slug: 'mul-mul-sarees',
+        path: '/category/sarees/mul-mul-sarees',
         tagline: 'Feather-light ethereal cotton-silk weaves.',
         description: 'Feather-light ethereal cotton-silk weaves with delicate pastel borders and subtle gold thread work.',
         image: '/assets/images/featured-saree.jpg',
-        seoTitle: 'Mal Mal Sarees | DORCASS Luxury Weaves',
-        seoDescription: 'Shop handcrafted Mal Mal sarees in ethereal pastel shades and breathable silk-cotton blends.'
+        seoTitle: 'Mul Mul Sarees | DORCASS Luxury Weaves',
+        seoDescription: 'Shop handcrafted Mul Mul sarees in ethereal pastel shades and breathable silk-cotton blends.'
       },
       {
         id: 'linen',
@@ -57,24 +57,24 @@ export const CATEGORIES_DATA = [
         path: '/category/sarees/linen',
         tagline: 'Modern minimalist luxury with organic grace.',
         description: 'Breathable organic luxury linen with zari borders, dual-tone antique pallus, and hand-knotted tassels.',
-        image: '/assets/images/featured-saree.jpg',
+        image: '/assets/products/Salwars/Linen_3_pcs_set.jpeg',
         seoTitle: 'Organic Linen Sarees | DORCASS',
         seoDescription: 'Discover pure organic handwoven linen sarees with antique zari borders for modern minimal elegance.'
       },
       {
-        id: 'modal-banthini',
-        name: 'Modal banthini',
-        slug: 'modal-banthini',
-        path: '/category/sarees/modal-banthini',
+        id: 'modal-bandhej',
+        name: 'Modal bandhej',
+        slug: 'modal-bandhej',
+        path: '/category/sarees/modal-bandhej',
         tagline: 'Handcrafted micro-dot tie-dye heritage.',
         description: 'Traditional handcrafted tie-dye elegance created by master artisans in celebration-ready vibrant palettes.',
-        image: '/assets/images/featured-saree.jpg',
-        seoTitle: 'Modal Banthini Sarees | DORCASS',
-        seoDescription: 'Authentic handcrafted modal bandhani sarees with artisan resist-dye craftsmanship.'
+        image: '/assets/products/Salwars/Modal_3_pcs_set.jpeg',
+        seoTitle: 'Modal Bandhej Sarees | DORCASS',
+        seoDescription: 'Authentic handcrafted modal bandhej sarees with artisan resist-dye craftsmanship.'
       },
       {
         id: 'chennur-silks',
-        name: 'Chennur silks',
+        name: 'chennur silks',
         slug: 'chennur-silks',
         path: '/category/sarees/chennur-silks',
         tagline: 'Rich luster South Indian royal weaves.',
@@ -90,7 +90,7 @@ export const CATEGORIES_DATA = [
         path: '/category/sarees/tissue-silk',
         tagline: 'Translucent metallic sheen with golden highlights.',
         description: 'Translucent metallic sheen festive sarees adorned with intricate zari motifs and opulent pallus.',
-        image: '/assets/images/featured-saree.jpg',
+        image: '/assets/products/Salwars/Tissue_silk.jpeg',
         seoTitle: 'Tissue Silk Sarees | DORCASS',
         seoDescription: 'Festive tissue silk sarees with iridescent metallic glow and exquisite unstitched blouse pieces.'
       }
@@ -103,31 +103,31 @@ export const CATEGORIES_DATA = [
     path: '/category/salwars',
     tagline: 'Artisanal suit sets tailored for effortless poise.',
     description: 'Tailored suit sets with artisanal dupattas, delicate embroidery, and breathable luxury fabrics.',
-    image: '/assets/images/product-kurti.jpg',
+    image: '/assets/products/Mulchanderi/Mul_chanderi.jpeg',
     seoTitle: 'Salwars & Suit Sets | DORCASS Luxury Fashion',
-    seoDescription: 'Shop designer salwar suit sets in Malchendari, Maslin, Dolo Silk, Shinmari tissue, Gaji silk, and pure cotton.',
+    seoDescription: 'Shop designer salwar suit sets in Mulchendari, Muslin, Dolo Silk, Shimmery tissue, Luxury grape, chion Materials, Gaji silk, and pure cotton.',
     children: [
       {
-        id: 'malchendari',
-        name: 'Malchendari',
-        slug: 'malchendari',
-        path: '/category/salwars/malchendari',
+        id: 'mulchendari',
+        name: 'Mulchendari',
+        slug: 'mulchendari',
+        path: '/category/salwars/mulchendari',
         tagline: 'Lightweight heritage chanderi-mul blend suits.',
         description: 'Lightweight heritage chanderi-mul blend suits with handblocked organza dupattas and intricate neckline embroidery.',
-        image: '/assets/images/product-kurti.jpg',
-        seoTitle: 'Malchendari Salwar Suits | DORCASS',
-        seoDescription: 'Pure Malchendari silk salwar suits featuring artisan thread embroidery and handblock prints.'
+        image: '/assets/products/Mulchanderi/Mul_chanderi.jpeg',
+        seoTitle: 'Mulchendari Salwar Suits | DORCASS',
+        seoDescription: 'Pure Mulchendari silk salwar suits featuring artisan thread embroidery and handblock prints.'
       },
       {
-        id: 'maslin',
-        name: 'Maslin',
-        slug: 'maslin',
-        path: '/category/salwars/maslin',
-        tagline: 'Ultra-soft fine mul-maslin suits.',
-        description: 'Ultra-soft fine mul-maslin suits with pearl lace neck accents and flowing lightweight dupattas.',
+        id: 'muslin',
+        name: 'Muslin',
+        slug: 'muslin',
+        path: '/category/salwars/muslin',
+        tagline: 'Ultra-soft fine mul-muslin suits.',
+        description: 'Ultra-soft fine mul-muslin suits with pearl lace neck accents and flowing lightweight dupattas.',
         image: '/assets/images/product-kurti.jpg',
-        seoTitle: 'Maslin Salwar Suits | DORCASS',
-        seoDescription: 'Graceful fine maslin salwar suits with soft cotton lining and handcrafted dupattas.'
+        seoTitle: 'Muslin Salwar Suits | DORCASS',
+        seoDescription: 'Graceful fine muslin salwar suits with soft cotton lining and handcrafted dupattas.'
       },
       {
         id: 'dolo-silk',
@@ -136,20 +136,20 @@ export const CATEGORIES_DATA = [
         path: '/category/salwars/dolo-silk',
         tagline: 'Smooth liquid-drape dolo silk suits.',
         description: 'Smooth liquid-drape dolo silk straight-cut suits accompanied by jacquard weave silk dupattas and cigarette trousers.',
-        image: '/assets/images/product-kurti.jpg',
+        image: '/assets/products/Pure dolo silk/Pure_Dola_silk.jpeg',
         seoTitle: 'Dolo Silk Salwars | DORCASS',
         seoDescription: 'Lustrous dolo silk festive salwar sets with rich texture and flattering drape.'
       },
       {
-        id: 'shinmari-tissue',
-        name: 'Shinmari tissue',
-        slug: 'shinmari-tissue',
-        path: '/category/salwars/shinmari-tissue',
+        id: 'shimmery-tissue',
+        name: 'Shimmery tissue',
+        slug: 'shimmery-tissue',
+        path: '/category/salwars/shimmery-tissue',
         tagline: 'Regal lustrous partywear suits with metallic shimmer.',
         description: 'Regal lustrous partywear suits with gota patti handwork, scallop borders, and matching churidars.',
-        image: '/assets/images/product-kurti.jpg',
-        seoTitle: 'Shinmari Tissue Salwars | DORCASS',
-        seoDescription: 'Grand flared Shinmari tissue silk salwar suits embellished with festive gota patti.'
+        image: '/assets/products/Salwars/Shimmer_tissue.jpeg',
+        seoTitle: 'Shimmery Tissue Salwars | DORCASS',
+        seoDescription: 'Grand flared Shimmery tissue silk salwar suits embellished with festive gota patti.'
       },
       {
         id: 'luxury-grape',
@@ -158,20 +158,20 @@ export const CATEGORIES_DATA = [
         path: '/category/salwars/luxury-grape',
         tagline: 'Flowy crepe grape finish sets.',
         description: 'Wrinkle-resistant luxury grape crepe fabric that falls seamlessly, accented with minimalist cuff detailing.',
-        image: '/assets/images/product-kurti.jpg',
+        image: '/assets/products/crepe/Crepe_1.jpeg',
         seoTitle: 'Luxury Grape Salwars | DORCASS',
         seoDescription: 'Contemporary fluid luxury grape crepe salwar suits for effortless day-to-evening style.'
       },
       {
-        id: 'sinon-materials',
-        name: 'Sinon Materials',
-        slug: 'sinon-materials',
-        path: '/category/salwars/sinon-materials',
+        id: 'chion-materials',
+        name: 'chion Materials',
+        slug: 'chion-materials',
+        path: '/category/salwars/chion-materials',
         tagline: 'Modern silhouette structured occasion suits.',
         description: 'Modern silhouette structured occasion suits featuring asymmetric hemlines and statement sleeve cuffs.',
-        image: '/assets/images/product-kurti.jpg',
-        seoTitle: 'Sinon Materials Salwars | DORCASS',
-        seoDescription: 'High-fashion Sinon Materials textured silk salwar suits for cocktail evenings and celebrations.'
+        image: '/assets/products/chinon/Chinon_1.jpeg',
+        seoTitle: 'chion Materials Salwars | DORCASS',
+        seoDescription: 'High-fashion chion Materials textured silk salwar suits for cocktail evenings and celebrations.'
       },
       {
         id: 'gaji-silk',
@@ -190,10 +190,10 @@ export const CATEGORIES_DATA = [
         slug: 'cotton',
         path: '/category/salwars/cotton',
         tagline: '100% Breathable pure combed cotton daily wear.',
-        description: '100% Breathable pure combed organic cotton daily wear with traditional handblock motifs and mulmul dupattas.',
-        image: '/assets/images/product-kurti.jpg',
+        description: '100% Breathable pure combed organic cotton daily wear with traditional handblock motifs and mulmul dupattas. Available in M-38, L-40, XL-42, XXL-44, XXX-46.',
+        image: '/assets/products/cotton/Cotton_Salwar.jpeg',
         seoTitle: 'Pure Cotton Salwars | DORCASS',
-        seoDescription: 'Breathable pure combed cotton daily salwar suits with artisanal Sanganeri prints.'
+        seoDescription: 'Breathable pure combed cotton daily salwar suits with artisanal Sanganeri prints. Sizes M-38 to XXX-46.'
       }
     ]
   },
@@ -371,6 +371,21 @@ export function normalizePath(rawPath) {
   }
   if (path.includes('/kurties')) {
     path = path.replace('/kurties', '/kurtis');
+  }
+  if (path.includes('/mal-mal-sarees')) {
+    path = path.replace('/mal-mal-sarees', '/mul-mul-sarees');
+  }
+  if (path.includes('/modal-banthini')) {
+    path = path.replace('/modal-banthini', '/modal-bandhej');
+  }
+  if (path.includes('/maslin')) {
+    path = path.replace('/maslin', '/muslin');
+  }
+  if (path.includes('/shinmari-tissue')) {
+    path = path.replace('/shinmari-tissue', '/shimmery-tissue');
+  }
+  if (path.includes('/sinon-materials') || path.includes('/chinon-materials')) {
+    path = path.replace('/sinon-materials', '/chion-materials').replace('/chinon-materials', '/chion-materials');
   }
   
   return path;

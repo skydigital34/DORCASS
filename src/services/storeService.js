@@ -1,4 +1,5 @@
 import { CATEGORIES_DATA } from '../data/categoriesData';
+import { DEFAULT_PRODUCTS } from '../data/defaultProducts';
 import { 
   syncProductToFirestore, 
   deleteProductFromFirestore, 
@@ -7,8 +8,8 @@ import {
   isFirebaseConfigured
 } from './firebase';
 
-const PRODUCTS_STORAGE_KEY = 'dorcass_products_custom_v1';
-const CATEGORIES_STORAGE_KEY = 'dorcass_categories_custom_v1';
+const PRODUCTS_STORAGE_KEY = 'dorcass_products_custom_v2';
+const CATEGORIES_STORAGE_KEY = 'dorcass_categories_custom_v2';
 
 // Event listener mechanism for cross-component real-time sync
 const listeners = new Set();
@@ -69,14 +70,27 @@ export const getStoredProducts = () => {
     const raw = localStorage.getItem(PRODUCTS_STORAGE_KEY);
     if (raw) {
       const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed)) {
+      if (Array.isArray(parsed) && parsed.length > 0) {
         return parsed;
       }
     }
   } catch (e) {
-    console.error('Failed to parse stored products, defaulting to empty list:', e);
+    console.error('Failed to parse stored products, defaulting to seed list:', e);
   }
-  return [];
+  const initial = deepClone(DEFAULT_PRODUCTS);
+  saveStoredProducts(initial, false);
+  return initial;
+};
+
+/**
+ * Reset and restore entire catalog and categories to default collection
+ */
+export const resetCatalogToDefault = () => {
+  const initialCategories = deepClone(CATEGORIES_DATA);
+  const initialProducts = deepClone(DEFAULT_PRODUCTS);
+  saveStoredCategories(initialCategories);
+  saveStoredProducts(initialProducts, true);
+  return { categories: initialCategories, products: initialProducts };
 };
 
 /**

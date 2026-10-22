@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { isFirebaseConfigured } from '../services/firebase';
 import { uploadImageToCloudinary, isCloudinaryConfigured } from '../services/cloudinary';
 
-const STANDARD_SIZES = ['S', 'M', 'L', 'XL', 'XXL', 'XXXL', 'Free Size'];
+const STANDARD_SIZES = ['S', 'M', 'L', 'XL', 'XXL', 'XXXL', 'M-38', 'L-40', 'XL-42', 'XXL-44', 'XXX-46', 'Free Size', 'Adjustable', '2.4', '2.6', '2.8'];
 
 export const ProductForm = ({ 
   product = null, 

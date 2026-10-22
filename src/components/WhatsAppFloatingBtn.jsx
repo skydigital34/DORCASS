@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 
 export const WhatsAppFloatingBtn = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const phoneNumber = '917305323208';
-  const displayPhone = '+91 73053 23208';
+  const phoneNumber = '919500320265';
+  const displayPhone = '+91 95003 20265';
   const email = 'dorcasspopstore@gmail.com';
   const address = '6th Street, cross cut, Gandhipuram, Coimbatore';
   const whatsappUrl = 'https://wa.me/' + phoneNumber + '?text=' + encodeURIComponent('Hello DORCASS, I am interested in your luxury collections. Please assist me.');

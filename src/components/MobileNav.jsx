@@ -382,7 +382,7 @@ export const MobileNav = ({
 
           <div className="mobile-nav-quick-actions">
             <a 
-              href="https://wa.me/917305323208?text=Hello%20DORCASS%2C%20I%20am%20interested%20in%20your%20collection" 
+              href="https://wa.me/919500320265?text=Hello%20DORCASS%2C%20I%20am%20interested%20in%20your%20collection" 
               target="_blank" 
               rel="noopener noreferrer" 
               className="mobile-quick-btn whatsapp"
@@ -393,7 +393,7 @@ export const MobileNav = ({
               <span>WhatsApp</span>
             </a>
             <a 
-              href="tel:+917305323208" 
+              href="tel:+919500320265" 
               className="mobile-quick-btn phone"
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">

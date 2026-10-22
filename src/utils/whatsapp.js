@@ -2,7 +2,7 @@
  * DORCASS Luxury Fashion - WhatsApp Integration Helper
  */
 
-export const DORCASS_WHATSAPP_NUMBER = '917305323208';
+export const DORCASS_WHATSAPP_NUMBER = '919500320265';
 
 /**
  * Formats full cart details into a clean, professional order message
