@@ -5,6 +5,7 @@ export const MobileNav = ({
   isOpen, 
   onClose, 
   onNavigate, 
+  onOpenLogin,
   activeCategorySlug, 
   activeSubcategorySlug, 
   activeTertiarySlug,
@@ -79,7 +80,12 @@ export const MobileNav = ({
 
     if (mobileClickCountRef.current === 3) {
       mobileClickCountRef.current = 0;
-      handleNavClick('/admin', null);
+      onClose();
+      if (onOpenLogin) {
+        onOpenLogin();
+      } else {
+        handleNavClick('/admin', null);
+      }
       return;
     }
 
@@ -347,15 +353,28 @@ export const MobileNav = ({
               </button>
             </li>
 
-            {/* 5. ADMIN PORTAL */}
+            {/* 5. LOGIN */}
             <li className="mobile-nav-item" style={{ marginTop: '8px' }}>
               <button
-                className={`mobile-nav-link ${activePath === '/admin' ? 'is-active' : ''}`}
-                onClick={() => handleNavClick('/admin', null, null, null, null)}
+                className="mobile-nav-link"
+                onClick={() => {
+                  onClose();
+                  if (onOpenLogin) {
+                    onOpenLogin();
+                  } else {
+                    handleNavClick('/admin', null, null, null, null);
+                  }
+                }}
                 style={{ color: 'var(--brand-pink-primary)', fontWeight: 700 }}
               >
-                <span>⚙️ ADMIN PORTAL</span>
-                <span className="mobile-nav-pill" style={{ background: 'var(--brand-pink-primary)', color: '#FFF' }}>Portal</span>
+                <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                  </svg>
+                  <span>LOGIN</span>
+                </span>
+                <span className="mobile-nav-pill" style={{ background: 'var(--brand-pink-primary)', color: '#FFF' }}>Secure</span>
               </button>
             </li>
           </ul>

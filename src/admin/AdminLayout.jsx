@@ -4,6 +4,7 @@ export const AdminLayout = ({
   activeTab, 
   onSelectTab, 
   onNavigateStore, 
+  onLogout,
   productsCount = 0, 
   categoriesCount = 0,
   children 
@@ -147,6 +148,20 @@ export const AdminLayout = ({
             </svg>
             <span>Exit to Storefront</span>
           </button>
+          {onLogout && (
+            <button 
+              className="admin-view-store-btn" 
+              onClick={onLogout}
+              style={{ marginTop: '8px', color: '#EF4444', borderColor: 'rgba(239, 68, 68, 0.25)' }}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                <polyline points="16 17 21 12 16 7"></polyline>
+                <line x1="21" y1="12" x2="9" y2="12"></line>
+              </svg>
+              <span>Logout</span>
+            </button>
+          )}
         </div>
       </aside>
 
@@ -192,6 +207,22 @@ export const AdminLayout = ({
                 <line x1="10" y1="14" x2="21" y2="3"></line>
               </svg>
             </button>
+
+            {onLogout && (
+              <button 
+                className="admin-btn-secondary"
+                onClick={onLogout}
+                title="Logout from Admin Portal"
+                style={{ color: '#EF4444', borderColor: 'rgba(239, 68, 68, 0.3)' }}
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                  <polyline points="16 17 21 12 16 7"></polyline>
+                  <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
+                <span>Logout</span>
+              </button>
+            )}
           </div>
         </header>
 

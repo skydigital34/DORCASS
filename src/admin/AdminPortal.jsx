@@ -18,7 +18,7 @@ import { ProductForm } from './ProductForm';
 import { CategoryManager } from './CategoryManager';
 import { FirebaseSettings } from './FirebaseSettings';
 
-export const AdminPortal = ({ onNavigateStore, onToast }) => {
+export const AdminPortal = ({ onNavigateStore, onToast, onLogout }) => {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -118,6 +118,7 @@ export const AdminPortal = ({ onNavigateStore, onToast }) => {
         setActiveTab(tab);
       }}
       onNavigateStore={onNavigateStore}
+      onLogout={onLogout}
       productsCount={products.length}
       categoriesCount={categories.length}
     >

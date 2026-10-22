@@ -18,6 +18,7 @@ import { Toast } from './components/Toast';
 import { WhatsAppFloatingBtn } from './components/WhatsAppFloatingBtn';
 import { generateCartWhatsAppUrl } from './utils/whatsapp';
 import { AdminPortal } from './admin/AdminPortal';
+import { AdminLoginModal } from './components/AdminLoginModal';
 import { getStoredProducts, getStoredCategories, subscribeToStore } from './services/storeService';
 
 export function App() {
@@ -57,6 +58,35 @@ export function App() {
     setTimeout(() => {
       setToasts(prev => prev.filter(t => t.id !== id));
     }, 3500);
+  };
+
+  // Admin Authentication State
+  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(() => {
+    return sessionStorage.getItem('dorcass_admin_auth') === 'true';
+  });
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+
+  const handleLoginSuccess = () => {
+    sessionStorage.setItem('dorcass_admin_auth', 'true');
+    setIsAdminLoggedIn(true);
+    setIsLoginModalOpen(false);
+    handleNavigate({ path: '/admin' });
+    addToast('Admin login successful! Welcome to DORCASS Portal.');
+  };
+
+  const handleLogout = () => {
+    sessionStorage.removeItem('dorcass_admin_auth');
+    setIsAdminLoggedIn(false);
+    handleNavigate({ path: '/' });
+    addToast('Logged out of Admin Portal.');
+  };
+
+  const handleOpenLogin = () => {
+    if (isAdminLoggedIn) {
+      handleNavigate({ path: '/admin' });
+    } else {
+      setIsLoginModalOpen(true);
+    }
   };
 
   // Synchronize state with URL path
@@ -255,13 +285,27 @@ export function App() {
 
   const currentCategoryInfo = resolveNavigationFromPath(currentPath);
 
-  // If in Admin Portal, render dedicated Admin Area
+  // If in Admin Portal, render dedicated Admin Area (protected by credentials)
   if (isAdminRoute) {
+    if (!isAdminLoggedIn) {
+      return (
+        <div className="site-wrapper">
+          <AdminLoginModal
+            isOpen={true}
+            onClose={() => handleNavigate({ path: '/' })}
+            onLoginSuccess={handleLoginSuccess}
+          />
+          <Toast toasts={toasts} />
+        </div>
+      );
+    }
+
     return (
       <>
         <AdminPortal 
           onNavigateStore={() => handleNavigate({ path: '/' })} 
           onToast={addToast} 
+          onLogout={handleLogout}
         />
         <Toast toasts={toasts} />
       </>
@@ -274,6 +318,7 @@ export function App() {
       <Header 
         onOpenSearch={() => setIsSearchOpen(true)}
         onOpenCart={() => setIsCartOpen(true)}
+        onOpenLogin={handleOpenLogin}
         cartCount={cartTotalItems}
         userAvatar="/assets/images/avatar-1.jpg"
         onNavigate={handleNavigate}
@@ -354,6 +399,12 @@ export function App() {
         onClose={() => setIsSearchOpen(false)}
         products={products}
         onQuickView={handleOpenQuickView}
+      />
+
+      <AdminLoginModal 
+        isOpen={isLoginModalOpen}
+        onClose={() => setIsLoginModalOpen(false)}
+        onLoginSuccess={handleLoginSuccess}
       />
 
       <Toast toasts={toasts} />

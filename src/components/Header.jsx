@@ -5,6 +5,7 @@ import { MobileNav } from './MobileNav';
 export const Header = ({ 
   onOpenSearch, 
   onOpenCart, 
+  onOpenLogin,
   cartCount, 
   userAvatar, 
   onNavigate,
@@ -58,7 +59,9 @@ export const Header = ({
 
     if (clickCountRef.current === 3) {
       clickCountRef.current = 0;
-      if (onNavigate) {
+      if (onOpenLogin) {
+        onOpenLogin();
+      } else if (onNavigate) {
         onNavigate({ path: '/admin' });
       }
       return;
@@ -216,30 +219,32 @@ export const Header = ({
                 </svg>
               </button>
 
-              {/* Admin Portal Quick Access */}
+              {/* Login Button */}
               <button 
-                className="user-profile-btn" 
-                onClick={() => handleDirectNav(null, '/admin', null)} 
-                aria-label="Admin Portal" 
-                title="DORCASS Admin Portal"
-                style={{ position: 'relative' }}
+                className="header-login-btn" 
+                onClick={onOpenLogin} 
+                aria-label="Login" 
+                title="Login"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '7px 14px',
+                  borderRadius: '20px',
+                  border: '1.5px solid var(--brand-pink-border, #FAD2DF)',
+                  background: '#FFFFFF',
+                  color: 'var(--text-main, #2D2327)',
+                  fontSize: '0.82rem',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease'
+                }}
               >
-                <img src={userAvatar || "/assets/images/avatar-1.jpg"} alt="Admin Portal" />
-                <span style={{
-                  position: 'absolute',
-                  bottom: '-2px',
-                  right: '-2px',
-                  background: 'var(--brand-pink-primary)',
-                  color: '#FFF',
-                  fontSize: '9px',
-                  fontWeight: 'bold',
-                  padding: '1px 4px',
-                  borderRadius: '6px',
-                  border: '1px solid #FFF',
-                  lineHeight: '1'
-                }}>
-                  ADM
-                </span>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                <span>Login</span>
               </button>
 
               {/* Cart Pill Button (Outlined pill with cart icon + item count) */}
@@ -265,6 +270,7 @@ export const Header = ({
         isOpen={isMobileNavOpen}
         onClose={() => setIsMobileNavOpen(false)}
         onNavigate={onNavigate}
+        onOpenLogin={onOpenLogin}
         activeCategorySlug={activeCategorySlug}
         activeSubcategorySlug={activeSubcategorySlug}
         activeTertiarySlug={activeTertiarySlug}
